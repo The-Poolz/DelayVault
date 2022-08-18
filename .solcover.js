@@ -1,3 +1,3 @@
 module.exports = {
-  client: require("ganache-cli")
+    client: require("ganache-cli")
 }

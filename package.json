@@ -1,5 +1,5 @@
 {
-  "name": "poolz-multi-sender",
+  "name": "poolz-delay-vault",
   "version": "1.0.0",
   "description": "",
   "main": "truffle-config.js",
@@ -29,9 +29,10 @@
     "chai-as-promised": "^7.1.1",
     "chai-bignumber": "^2.0.2",
     "ganache-cli": "^6.12.2",
+    "poolz-helper": "^1.1.7",
     "poolz-helper-v2": "^2.0.3",
-    "truffle-plugin-verify": "^0.5.7",
     "prettier": "^2.7.1",
-    "prettier-plugin-solidity": "^1.0.0-dev.23"
+    "prettier-plugin-solidity": "^1.0.0-dev.23",
+    "truffle-plugin-verify": "^0.5.7"
   }
 }
