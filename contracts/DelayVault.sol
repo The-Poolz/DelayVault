@@ -5,8 +5,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "poolz-helper-v2/contracts/ERC20Helper.sol";
 import "poolz-helper-v2/contracts/ETHHelper.sol";
 import "./VaultManageable.sol";
-// we can't use poolz-helper interface because ILockedDeal-V1 has solidity version 0.6.0
-import "./ILockedDeal.sol";
+import "poolz-helper-v2/contracts/interfaces/ILockedDeal.sol";
 
 /// @title main DelayVault settings
 /// @author The-Poolz contract team
