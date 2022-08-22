@@ -12,14 +12,12 @@ contract VaultManageable is Pausable, GovManager {
     bool public isTokenFilterOn;
     uint256 public MaxDelay;
     uint256 public MinDelay;
-    uint256 public VaultId;
-    mapping(uint256 => Vault) VaultMap;
+    mapping(address => address[]) MyTokens;
+    mapping(address => mapping(address => Vault)) VaultMap;
 
     struct Vault {
-        address Token;
         uint256 Amount;
         uint64 LockPeriod;
-        address Owner;
     }
 
     modifier uniqueValue(uint256 _value, uint256 _oldValue) {
