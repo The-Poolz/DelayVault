@@ -52,17 +52,18 @@ contract DelayVault is VaultManageable, ERC20Helper {
     {
         Vault storage vault = VaultMap[_token][msg.sender];
         require(
-            _amount <= VaultMap[_token][msg.sender].Amount,
+            VaultMap[_token][msg.sender].Amount >= _amount,
             "not enough amount in vault"
         );
         uint64 finishTime = uint64(block.timestamp) + vault.LockPeriod;
-        ApproveAllowanceERC20(_token, LockedDealAddress, vault.Amount);
+        ApproveAllowanceERC20(_token, LockedDealAddress, _amount);
         ILockedDeal(LockedDealAddress).CreateNewPool(
             _token,
             finishTime,
-            vault.Amount,
+            _amount,
             msg.sender
         );
+        VaultMap[_token][msg.sender].Amount -= _amount;
         emit LockedPeriodStarted(_token, vault.Amount, finishTime);
     }
 
