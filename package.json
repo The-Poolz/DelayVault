@@ -21,7 +21,6 @@
     "ganache-time-traveler": "^1.0.15",
     "poolz-locked-deal": "^1.0.6",
     "solidity-coverage": "^0.7.19",
-    "truffle": "^5.5.12",
     "truffle-assertions": "^0.9.2"
   },
   "devDependencies": {
@@ -30,7 +29,7 @@
     "chai-bignumber": "^2.0.2",
     "ganache-cli": "^6.12.2",
     "poolz-helper": "^1.1.7",
-    "poolz-helper-v2": "^2.0.13",
+    "poolz-helper-v2": "^2.0.14",
     "prettier": "^2.7.1",
     "prettier-plugin-solidity": "^1.0.0-dev.23",
     "truffle-plugin-verify": "^0.5.7"

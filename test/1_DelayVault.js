@@ -16,12 +16,10 @@ contract("DelayVault", (accounts) => {
         const week = 7 * 24 * 60 * 60
         await token.approve(instance.address, amount)
         const tx = await instance.CreateVault(token.address, amount, week)
-        const id = tx.logs[tx.logs.length - 1].args.Id
         const tokenAddr = tx.logs[tx.logs.length - 1].args.Token
         const quantity = tx.logs[tx.logs.length - 1].args.Amount
         const lockTime = tx.logs[tx.logs.length - 1].args.LockTime
         const owner = tx.logs[tx.logs.length - 1].args.Owner
-        assert.equal(id, 0)
         assert.equal(tokenAddr.toString(), token.address)
         assert.equal(quantity.toString(), amount.toString())
         assert.equal(lockTime.toString(), week.toString())
