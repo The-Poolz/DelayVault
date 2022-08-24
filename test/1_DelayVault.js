@@ -1,7 +1,8 @@
-const { assert } = require("chai")
-
 const DelayVault = artifacts.require("DelayVault")
 const TestToken = artifacts.require("ERC20Token")
+
+const { assert } = require("chai")
+const truffleAssert = require("truffle-assertions")
 
 contract("DelayVault", (accounts) => {
     let instance, token
@@ -25,4 +26,16 @@ contract("DelayVault", (accounts) => {
         assert.equal(lockTime.toString(), week.toString())
         assert.equal(owner.toString(), accounts[0].toString())
     })
+
+    // it("should revert invalid blocking period", async () => {
+    //     const day = 1 * 24 * 60 * 60
+    //     const twoDays = day * 2
+    //     const threeDays = day * 3
+    //     const amounts = [10, 30, 1000]
+    //     const lockPeriods = [day, twoDays, threeDays]
+    //     await instance.setMinDelays(amounts, lockPeriods)
+    //     await token.approve(instance.address, amount)
+    //     await truffleAssert.reverts(instance.CreateVault(token.address, amount, day), "Invalid blocking period!")
+    //     await instance.CreateVault(token.address, amount - 1, twoDays)
+    // })
 })

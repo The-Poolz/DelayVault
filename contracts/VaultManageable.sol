@@ -3,6 +3,7 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "poolz-helper-v2/contracts/GovManager.sol";
+import "poolz-helper-v2/contracts/Array.sol";
 
 /// @title all admin settings
 contract VaultManageable is Pausable, GovManager {
@@ -10,15 +11,21 @@ contract VaultManageable is Pausable, GovManager {
     address public WhiteListAddress;
     uint256 public WhiteListId;
     bool public isTokenFilterOn;
-    uint256 public MaxDelay;
-    uint256 public MinDelay;
-    mapping(address => address[]) MyTokens;
-    mapping(address => mapping(address => Vault)) VaultMap;
+    Delay TokenLimit;
+    mapping(address => address[]) public MyTokens;
+    mapping(address => mapping(address => Vault)) public VaultMap;
 
     struct Vault {
         uint256 Amount;
         uint64 LockPeriod;
     }
+
+    struct Delay {
+        uint256[] Amounts;
+        uint64[] MinDelays;
+    }
+
+    event UpdatedMinDelays(uint256[] Amounts, uint64[] MinDelays);
 
     modifier uniqueValue(uint256 _value, uint256 _oldValue) {
         require(_value != _oldValue, "can't set the same value");
@@ -27,6 +34,11 @@ contract VaultManageable is Pausable, GovManager {
 
     modifier uniqueAddress(address _addr, address _oldAddr) {
         require(_addr != _oldAddr, "can't set the same address");
+        _;
+    }
+
+    modifier notZeroAddress(address _addr) {
+        require(_addr != address(0), "address can't be null");
         _;
     }
 
@@ -58,28 +70,14 @@ contract VaultManageable is Pausable, GovManager {
         isTokenFilterOn = !isTokenFilterOn;
     }
 
-    function setMaxDelay(uint256 _maxDelay)
+    function setMinDelays(uint256[] memory _amounts, uint64[] memory _minDelays)
         public
         onlyOwnerOrGov
-        uniqueValue(_maxDelay, MaxDelay)
     {
-        require(
-            _maxDelay >= MinDelay,
-            "the maximum delay can't be less than the minimum delay!"
-        );
-        MaxDelay = _maxDelay;
-    }
-
-    function setMinDelay(uint256 _minDelay)
-        public
-        onlyOwnerOrGov
-        uniqueValue(_minDelay, MinDelay)
-    {
-        require(
-            _minDelay <= MaxDelay,
-            "the minimum delay can't be greater than the maximum delay!"
-        );
-        MinDelay = _minDelay;
+        require(_amounts.length == _minDelays.length, "invalid array length");
+        require(Array.isArrayOrdered(_amounts), "amounts should be ordered");
+        TokenLimit = Delay(_amounts, _minDelays);
+        emit UpdatedMinDelays(_amounts, _minDelays);
     }
 
     function Pause() public onlyOwnerOrGov {
