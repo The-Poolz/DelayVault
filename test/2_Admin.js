@@ -30,13 +30,6 @@ contract("Delay vault admin settings", (accounts) => {
         assert.equal(lockedDealAddr, lockedDeal.toString())
     })
 
-    it("should swap token filter", async () => {
-        const status = false
-        await instance.swapTokenFilter()
-        const filter = await instance.isTokenFilterOn()
-        assert.equal((!status).toString(), filter.toString())
-    })
-
     it("should set min delay", async () => {
         const day = 1 * 24 * 60 * 60
         const twoDays = day * 2
@@ -62,6 +55,13 @@ contract("Delay vault admin settings", (accounts) => {
         await instance.CreateVault(token.address, amount, week)
         await instance.Pause()
         await truffleAssert.reverts(instance.Withdraw(token.address), "Pausable: paused")
+    })
+
+    it("should swap token filter", async () => {
+        const status = false
+        await instance.swapTokenFilter()
+        const filter = await instance.isTokenFilterOn()
+        assert.equal((!status).toString(), filter.toString())
     })
 
     it("should revert with the same value", async () => {

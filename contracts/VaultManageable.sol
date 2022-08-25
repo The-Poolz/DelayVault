@@ -3,11 +3,8 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "poolz-helper-v2/contracts/GovManager.sol";
-<<<<<<< HEAD
 import "poolz-helper-v2/contracts/interfaces/IWhiteList.sol";
-=======
 import "poolz-helper-v2/contracts/Array.sol";
->>>>>>> ff375e4fe8d2ed6b9f0062484cc284af3eeb3d7c
 
 /// @title all admin settings
 contract VaultManageable is Pausable, GovManager {
