@@ -20,7 +20,7 @@ contract DelayVault is VaultData, ERC20Helper {
     modifier isVaultNotEmpty(address _token) {
         require(
             VaultMap[_token][msg.sender].Amount > 0,
-            "Your vault is already empty!"
+            "vault is already empty"
         );
         _;
     }

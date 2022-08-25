@@ -1,16 +1,18 @@
 const DelayVault = artifacts.require("DelayVault")
+const TestToken = artifacts.require("ERC20Token")
 
 const truffleAssert = require("truffle-assertions")
 const { assert } = require("chai")
 
 contract("Delay vault admin settings", (accounts) => {
-    let instance
+    let instance, token
     const whiteListAddr = accounts[7]
     const lockedDealAddr = accounts[8]
     const id = 1
 
     before(async () => {
         instance = await DelayVault.new()
+        token = await TestToken.new("TestToken", "TEST")
     })
 
     it("should set WhiteList", async () => {
@@ -28,6 +30,13 @@ contract("Delay vault admin settings", (accounts) => {
         assert.equal(lockedDealAddr, lockedDeal.toString())
     })
 
+    it("should swap token filter", async () => {
+        const status = false
+        await instance.swapTokenFilter()
+        const filter = await instance.isTokenFilterOn()
+        assert.equal((!status).toString(), filter.toString())
+    })
+
     it("should set min delay", async () => {
         const day = 1 * 24 * 60 * 60
         const twoDays = day * 2
@@ -40,6 +49,19 @@ contract("Delay vault admin settings", (accounts) => {
         assert.equal(amounts.toString(), resAmounts.toString())
         assert.equal(lockPeriods.toString(), MinDelays.toString())
         await truffleAssert.reverts(instance.setMinDelays(amounts, [day, twoDays]), "invalid array length")
+    })
+
+    it("should pause contract", async () => {
+        await instance.Pause()
+        const amount = 1000
+        const day = 1 * 24 * 60 * 60
+        const week = day * 7
+        await token.approve(instance.address, amount)
+        await truffleAssert.reverts(instance.CreateVault(token.address, amount, week), "Pausable: paused")
+        await instance.Unpause()
+        await instance.CreateVault(token.address, amount, week)
+        await instance.Pause()
+        await truffleAssert.reverts(instance.Withdraw(token.address), "Pausable: paused")
     })
 
     it("should revert with the same value", async () => {

@@ -48,4 +48,9 @@ contract("DelayVault", (accounts) => {
             "can't set a shorter blocking period than the last one"
         )
     })
+
+    it("should revert when empty vault", async () => {
+        const token = await TestToken.new("TestToken", "TEST")
+        await truffleAssert.reverts(instance.Withdraw(token.address), "vault is already empty")
+    })
 })

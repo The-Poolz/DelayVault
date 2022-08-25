@@ -24,7 +24,7 @@ contract VaultData is VaultManageable {
     function GetTokenLimits()
         public
         view
-        returns (uint256[] memory _amount, uint64[] memory _minDelays)
+        returns (uint256[] memory _amount, uint256[] memory _minDelays)
     {
         return (TokenLimit.Amounts, TokenLimit.MinDelays);
     }

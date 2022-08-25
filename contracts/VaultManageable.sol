@@ -22,10 +22,10 @@ contract VaultManageable is Pausable, GovManager {
 
     struct Delay {
         uint256[] Amounts;
-        uint64[] MinDelays;
+        uint256[] MinDelays;
     }
 
-    event UpdatedMinDelays(uint256[] Amounts, uint64[] MinDelays);
+    event UpdatedMinDelays(uint256[] Amounts, uint256[] MinDelays);
 
     modifier uniqueValue(uint256 _value, uint256 _oldValue) {
         require(_value != _oldValue, "can't set the same value");
@@ -70,12 +70,13 @@ contract VaultManageable is Pausable, GovManager {
         isTokenFilterOn = !isTokenFilterOn;
     }
 
-    function setMinDelays(uint256[] memory _amounts, uint64[] memory _minDelays)
-        public
-        onlyOwnerOrGov
-    {
+    function setMinDelays(
+        uint256[] memory _amounts,
+        uint256[] memory _minDelays
+    ) public onlyOwnerOrGov {
         require(_amounts.length == _minDelays.length, "invalid array length");
         require(Array.isArrayOrdered(_amounts), "amounts should be ordered");
+        require(Array.isArrayOrdered(_minDelays), "amounts should be ordered");
         TokenLimit = Delay(_amounts, _minDelays);
         emit UpdatedMinDelays(_amounts, _minDelays);
     }
