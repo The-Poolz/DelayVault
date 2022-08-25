@@ -76,7 +76,7 @@ contract VaultManageable is Pausable, GovManager {
     ) public onlyOwnerOrGov {
         require(_amounts.length == _minDelays.length, "invalid array length");
         require(Array.isArrayOrdered(_amounts), "amounts should be ordered");
-        require(Array.isArrayOrdered(_minDelays), "amounts should be ordered");
+        require(Array.isArrayOrdered(_minDelays), "delays should be sorted");
         TokenLimit = Delay(_amounts, _minDelays);
         emit UpdatedMinDelays(_amounts, _minDelays);
     }
