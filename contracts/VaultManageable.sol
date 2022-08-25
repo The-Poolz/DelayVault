@@ -3,6 +3,7 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "poolz-helper-v2/contracts/GovManager.sol";
+import "poolz-helper-v2/contracts/interfaces/IWhiteList.sol";
 
 /// @title all admin settings
 contract VaultManageable is Pausable, GovManager {
@@ -56,6 +57,16 @@ contract VaultManageable is Pausable, GovManager {
 
     function swapTokenFilter() public onlyOwnerOrGov {
         isTokenFilterOn = !isTokenFilterOn;
+    }
+
+    function isTokenWhiteListed(address _tokenAddress)
+        public
+        view
+        returns (bool)
+    {
+        return
+            !isTokenFilterOn ||
+            IWhiteList(WhiteListAddress).Check(_tokenAddress, WhiteListId) > 0;
     }
 
     function setMaxDelay(uint256 _maxDelay)

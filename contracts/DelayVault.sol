@@ -32,11 +32,16 @@ contract DelayVault is VaultManageable, ERC20Helper {
         _;
     }
 
+    modifier isTokenValid(address _Token) {
+        require(isTokenWhiteListed(_Token), "Need Valid ERC20 Token");
+        _;
+    }
+
     function CreateVault(
         address _token,
         uint256 _amount,
         uint64 _lockTime
-    ) public whenNotPaused {
+    ) public whenNotPaused isTokenValid(_token) {
         require(_token != address(0), "invalid token address");
         require(_amount > 0, "amount should be greater than zero");
         TransferInToken(_token, msg.sender, _amount);
