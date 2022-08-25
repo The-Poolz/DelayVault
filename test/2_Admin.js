@@ -1,18 +1,18 @@
 const DelayVault = artifacts.require("DelayVault")
+const TestToken = artifacts.require("ERC20Token")
 
 const truffleAssert = require("truffle-assertions")
 const { assert } = require("chai")
 
 contract("Delay vault admin settings", (accounts) => {
-    let instance
+    let instance, token
     const whiteListAddr = accounts[7]
     const lockedDealAddr = accounts[8]
-    const minDelay = 1000
-    const maxDelay = 2000
     const id = 1
 
     before(async () => {
         instance = await DelayVault.new()
+        token = await TestToken.new("TestToken", "TEST")
     })
 
     it("should set WhiteList", async () => {
@@ -30,31 +30,43 @@ contract("Delay vault admin settings", (accounts) => {
         assert.equal(lockedDealAddr, lockedDeal.toString())
     })
 
-    it("should set min/max delay", async () => {
-        await instance.setMaxDelay(maxDelay)
-        await instance.setMinDelay(minDelay)
-        const max = await instance.MaxDelay()
-        const min = await instance.MinDelay()
-        assert.equal(max.toString(), maxDelay.toString())
-        assert.equal(min.toString(), minDelay.toString())
+    it("should swap token filter", async () => {
+        const status = false
+        await instance.swapTokenFilter()
+        const filter = await instance.isTokenFilterOn()
+        assert.equal((!status).toString(), filter.toString())
+    })
+
+    it("should set min delay", async () => {
+        const day = 1 * 24 * 60 * 60
+        const twoDays = day * 2
+        const threeDays = day * 3
+        const amounts = [10, 20, 30]
+        const lockPeriods = [day, twoDays, threeDays]
+        const tx = await instance.setMinDelays(amounts, lockPeriods)
+        const resAmounts = tx.logs[0].args.Amounts
+        const MinDelays = tx.logs[0].args.MinDelays
+        assert.equal(amounts.toString(), resAmounts.toString())
+        assert.equal(lockPeriods.toString(), MinDelays.toString())
+        await truffleAssert.reverts(instance.setMinDelays(amounts, [day, twoDays]), "invalid array length")
+    })
+
+    it("should pause contract", async () => {
+        await instance.Pause()
+        const amount = 1000
+        const day = 1 * 24 * 60 * 60
+        const week = day * 7
+        await token.approve(instance.address, amount)
+        await truffleAssert.reverts(instance.CreateVault(token.address, amount, week), "Pausable: paused")
+        await instance.Unpause()
+        await instance.CreateVault(token.address, amount, week)
+        await instance.Pause()
+        await truffleAssert.reverts(instance.Withdraw(token.address), "Pausable: paused")
     })
 
     it("should revert with the same value", async () => {
-        await truffleAssert.reverts(instance.setMaxDelay(maxDelay), "can't set the same value")
-        await truffleAssert.reverts(instance.setMinDelay(minDelay), "can't set the same value")
         await truffleAssert.reverts(instance.setWhiteListId(id), "can't set the same value")
         await truffleAssert.reverts(instance.setLockedDealAddress(lockedDealAddr), "can't set the same address")
         await truffleAssert.reverts(instance.setWhiteListAddress(whiteListAddr), "can't set the same address")
-    })
-
-    it("should revert with delay setup", async () => {
-        await truffleAssert.reverts(
-            instance.setMaxDelay(minDelay - 1),
-            "the maximum delay can't be less than the minimum delay!"
-        )
-        await truffleAssert.reverts(
-            instance.setMinDelay(maxDelay + 1),
-            "the minimum delay can't be greater than the maximum delay!"
-        )
     })
 })
