@@ -57,8 +57,9 @@ contract DelayVault is VaultData, ERC20Helper {
 
     function Withdraw(address _token)
         public
-        isVaultNotEmpty(_token)
         whenNotPaused
+        notZeroAddress(LockedDealAddress)
+        isVaultNotEmpty(_token)
     {
         Vault storage vault = VaultMap[_token][msg.sender];
         uint64 finishTime = uint64(block.timestamp) + vault.LockPeriod;

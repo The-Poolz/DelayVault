@@ -11,7 +11,6 @@ contract VaultManageable is Pausable, GovManager {
     address public LockedDealAddress;
     address public WhiteListAddress;
     uint256 public WhiteListId;
-    bool public isTokenFilterOn;
     Delay DelayLimit;
     mapping(address => address[]) public MyTokens;
     mapping(address => mapping(address => Vault)) public VaultMap;
@@ -67,17 +66,14 @@ contract VaultManageable is Pausable, GovManager {
         WhiteListId = _id;
     }
 
-    function swapTokenFilter() public onlyOwnerOrGov {
-        isTokenFilterOn = !isTokenFilterOn;
-    }
-
     function isTokenWhiteListed(address _tokenAddress)
         public
         view
         returns (bool)
     {
         return
-            !isTokenFilterOn ||
+            WhiteListAddress == address(0) ||
+            WhiteListId == 0 ||
             IWhiteList(WhiteListAddress).Check(_tokenAddress, WhiteListId) > 0;
     }
 
