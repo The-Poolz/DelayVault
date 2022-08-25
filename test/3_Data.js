@@ -9,6 +9,11 @@ contract("Delay vault data", (accounts) => {
         tokens = []
     const amount = 1000
     let addresses = []
+    const day = 1 * 24 * 60 * 60
+    const twoDays = day * 2
+    const threeDays = day * 3
+    const week = day * 7
+    const twoWeeks = day * 14
 
     before(async () => {
         instance = await DelayVault.new()
@@ -20,9 +25,6 @@ contract("Delay vault data", (accounts) => {
     })
 
     it("should get min delays", async () => {
-        const day = 1 * 24 * 60 * 60
-        const twoDays = day * 2
-        const threeDays = day * 3
         const amounts = [10, 20, 30]
         const lockPeriods = [day, twoDays, threeDays]
         await instance.setMinDelays(amounts, lockPeriods)
@@ -32,9 +34,6 @@ contract("Delay vault data", (accounts) => {
     })
 
     it("get min delay", async () => {
-        const day = 1 * 24 * 60 * 60
-        const week = day * 7
-        const twoWeeks = day * 14
         const amounts = [250, 500, 10000]
         const lockPeriods = [day, week, twoWeeks]
         await instance.setMinDelays(amounts, lockPeriods)
@@ -48,17 +47,19 @@ contract("Delay vault data", (accounts) => {
         assert.equal(minDelay.toString(), "0")
     })
 
-    it("should revert when not ordered array", async () => {
-        const day = 1 * 24 * 60 * 60
-        const week = day * 7
-        const twoWeeks = day * 14
+    it("should revert when not ordered amount", async () => {
         const amounts = [1000, 500, 10000]
         const lockPeriods = [day, week, twoWeeks]
         await truffleAssert.reverts(instance.setMinDelays(amounts, lockPeriods), "amounts should be ordered")
     })
 
+    it("should revert when not ordered delays", async () => {
+        const amounts = [250, 500, 10000]
+        const lockPeriods = [day, week, twoDays]
+        await truffleAssert.reverts(instance.setMinDelays(amounts, lockPeriods), "delays should be sorted")
+    })
+
     it("should get my token addresses", async () => {
-        const week = 7 * 24 * 60 * 60
         for (let i = 0; i < tokens.length; i++) {
             await tokens[i].approve(instance.address, amount)
             await instance.CreateVault(tokens[i].address, amount, week)
