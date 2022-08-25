@@ -21,26 +21,26 @@ contract VaultData is VaultManageable {
         return Array.KeepNElementsInArray(tokens, index);
     }
 
-    function GetTokenLimits()
+    function GetDelayLimits()
         public
         view
         returns (uint256[] memory _amount, uint256[] memory _minDelays)
     {
-        return (TokenLimit.Amounts, TokenLimit.MinDelays);
+        return (DelayLimit.Amounts, DelayLimit.MinDelays);
     }
 
     function GetMinDelay(uint256 _amount) public view returns (uint256 _delay) {
-        if (TokenLimit.Amounts.length == 0 || TokenLimit.Amounts[0] > _amount)
+        if (DelayLimit.Amounts.length == 0 || DelayLimit.Amounts[0] > _amount)
             return 0;
         uint256 tempAmount = 0;
-        _delay = TokenLimit.MinDelays[0];
-        for (uint256 i = 0; i < TokenLimit.Amounts.length; i++) {
+        _delay = DelayLimit.MinDelays[0];
+        for (uint256 i = 0; i < DelayLimit.Amounts.length; i++) {
             if (
-                _amount > TokenLimit.Amounts[i] &&
-                tempAmount < TokenLimit.Amounts[i]
+                _amount > DelayLimit.Amounts[i] &&
+                tempAmount < DelayLimit.Amounts[i]
             ) {
-                _delay = TokenLimit.MinDelays[i];
-                tempAmount = TokenLimit.Amounts[i];
+                _delay = DelayLimit.MinDelays[i];
+                tempAmount = DelayLimit.Amounts[i];
             }
         }
     }

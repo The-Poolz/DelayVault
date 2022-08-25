@@ -11,7 +11,7 @@ contract VaultManageable is Pausable, GovManager {
     address public WhiteListAddress;
     uint256 public WhiteListId;
     bool public isTokenFilterOn;
-    Delay TokenLimit;
+    Delay DelayLimit;
     mapping(address => address[]) public MyTokens;
     mapping(address => mapping(address => Vault)) public VaultMap;
 
@@ -77,7 +77,7 @@ contract VaultManageable is Pausable, GovManager {
         require(_amounts.length == _minDelays.length, "invalid array length");
         require(Array.isArrayOrdered(_amounts), "amounts should be ordered");
         require(Array.isArrayOrdered(_minDelays), "delays should be sorted");
-        TokenLimit = Delay(_amounts, _minDelays);
+        DelayLimit = Delay(_amounts, _minDelays);
         emit UpdatedMinDelays(_amounts, _minDelays);
     }
 

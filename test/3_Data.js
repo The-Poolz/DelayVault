@@ -24,11 +24,11 @@ contract("Delay vault data", (accounts) => {
         }
     })
 
-    it("should get min delays", async () => {
+    it("should get delay limit", async () => {
         const amounts = [10, 20, 30]
         const lockPeriods = [day, twoDays, threeDays]
         await instance.setMinDelays(amounts, lockPeriods)
-        const result = await instance.GetTokenLimits()
+        const result = await instance.GetDelayLimits()
         assert.equal(result[0].toString(), amounts.toString())
         assert.equal(result[1].toString(), lockPeriods.toString())
     })
