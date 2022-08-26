@@ -15,7 +15,12 @@ contract DelayVault is VaultData, ERC20Helper {
         uint64 LockTime,
         address Owner
     );
-    event LockedPeriodStarted(address Token, uint256 Amount, uint64 FinishTime);
+    event LockedPeriodStarted(
+        address Token,
+        uint256 Amount,
+        uint64 FinishTime,
+        address Owner
+    );
 
     modifier isVaultNotEmpty(address _token) {
         require(
@@ -72,6 +77,6 @@ contract DelayVault is VaultData, ERC20Helper {
             lockAmount,
             msg.sender
         );
-        emit LockedPeriodStarted(_token, lockAmount, finishTime);
+        emit LockedPeriodStarted(_token, lockAmount, finishTime, msg.sender);
     }
 }
