@@ -59,6 +59,7 @@ contract DelayVault is VaultData, ERC20Helper {
         uint64 finishTime = uint64(block.timestamp) + vault.LockPeriod;
         uint256 lockAmount = vault.Amount;
         vault.Amount = 0;
+        vault.LockPeriod = 0;
         ApproveAllowanceERC20(_token, LockedDealAddress, vault.Amount);
         ILockedDeal(LockedDealAddress).CreateNewPool(
             _token,
