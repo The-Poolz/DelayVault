@@ -15,7 +15,12 @@ contract DelayVault is VaultData, ERC20Helper {
         uint64 LockTime,
         address Owner
     );
-    event LockedPeriodStarted(address Token, uint256 Amount, uint64 FinishTime);
+    event LockedPeriodStarted(
+        address Token,
+        uint256 Amount,
+        uint64 FinishTime,
+        address Owner
+    );
 
     modifier isVaultNotEmpty(address _token) {
         require(
@@ -25,11 +30,16 @@ contract DelayVault is VaultData, ERC20Helper {
         _;
     }
 
+    modifier isTokenValid(address _Token) {
+        require(isTokenWhiteListed(_Token), "Need Valid ERC20 Token");
+        _;
+    }
+
     function CreateVault(
         address _token,
         uint256 _amount,
         uint64 _lockTime
-    ) public whenNotPaused notZeroAddress(_token) {
+    ) public whenNotPaused notZeroAddress(_token) isTokenValid(_token) {
         Vault storage vault = VaultMap[_token][msg.sender];
         require(
             _amount > 0 || _lockTime > vault.LockPeriod,
@@ -52,20 +62,21 @@ contract DelayVault is VaultData, ERC20Helper {
 
     function Withdraw(address _token)
         public
-        isVaultNotEmpty(_token)
         whenNotPaused
+        notZeroAddress(LockedDealAddress)
+        isVaultNotEmpty(_token)
     {
         Vault storage vault = VaultMap[_token][msg.sender];
         uint64 finishTime = uint64(block.timestamp) + vault.LockPeriod;
         uint256 lockAmount = vault.Amount;
         vault.Amount = 0;
-        ApproveAllowanceERC20(_token, LockedDealAddress, vault.Amount);
+        ApproveAllowanceERC20(_token, LockedDealAddress, lockAmount);
         ILockedDeal(LockedDealAddress).CreateNewPool(
             _token,
             finishTime,
             lockAmount,
             msg.sender
         );
-        emit LockedPeriodStarted(_token, lockAmount, finishTime);
+        emit LockedPeriodStarted(_token, lockAmount, finishTime, msg.sender);
     }
 }
