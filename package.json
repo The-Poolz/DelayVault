@@ -1,6 +1,6 @@
 {
   "name": "poolz-delay-vault",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "",
   "main": "truffle-config.js",
   "directories": {
@@ -9,7 +9,7 @@
   "scripts": {
     "prettier": "prettier --write /contracts/**/.sol && prettier --write test/"
   },
-  "author": "",
+  "author": "The-Poolz",
   "license": "ISC",
   "dependencies": {
     "@openzeppelin/contracts": "^4.5.0",
