@@ -17,7 +17,7 @@ contract VaultManageable is Pausable, GovManager {
 
     struct Vault {
         uint256 Amount;
-        uint64 LockPeriod;
+        uint256 LockPeriod;
     }
 
     struct Delay {
