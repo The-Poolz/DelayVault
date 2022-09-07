@@ -60,7 +60,7 @@ contract DelayVault is VaultData, ERC20Helper {
         emit NewVaultCreated(_token, _amount, _lockTime, msg.sender);
     }
 
-    function Withdraw(address _token)
+    function Withdraw(address _token, uint256 _startWithdraw)
         public
         whenNotPaused
         notZeroAddress(LockedDealAddress)
@@ -73,7 +73,7 @@ contract DelayVault is VaultData, ERC20Helper {
         ApproveAllowanceERC20(_token, LockedDealAddress, lockAmount);
         ILockedDealV2(LockedDealAddress).CreateNewPool(
             _token,
-            block.timestamp,
+            block.timestamp + _startWithdraw,
             finishTime,
             lockAmount,
             msg.sender

@@ -16,6 +16,7 @@ contract("Delay vault admin settings", (accounts) => {
     })
 
     it("should pause contract", async () => {
+        const startWithdraw = 0
         await instance.Pause()
         const amount = 1000
         const day = 1 * 24 * 60 * 60
@@ -25,7 +26,7 @@ contract("Delay vault admin settings", (accounts) => {
         await instance.Unpause()
         await instance.CreateVault(token.address, amount, week)
         await instance.Pause()
-        await truffleAssert.reverts(instance.Withdraw(token.address), "Pausable: paused")
+        await truffleAssert.reverts(instance.Withdraw(token.address, startWithdraw), "Pausable: paused")
         await instance.Unpause()
     })
 
