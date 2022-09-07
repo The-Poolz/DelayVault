@@ -25,9 +25,6 @@ contract("Delay vault admin settings", (accounts) => {
         await truffleAssert.reverts(instance.CreateVault(token.address, amount, week), "Pausable: paused")
         await instance.Unpause()
         await instance.CreateVault(token.address, amount, week)
-        await instance.Pause()
-        await truffleAssert.reverts(instance.Withdraw(token.address, startWithdraw), "Pausable: paused")
-        await instance.Unpause()
     })
 
     it("should set WhiteList", async () => {
