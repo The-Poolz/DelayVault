@@ -3,7 +3,7 @@ pragma solidity ^0.8.0;
 
 import "poolz-helper-v2/contracts/ERC20Helper.sol";
 import "poolz-helper-v2/contracts/ETHHelper.sol";
-import "poolz-helper-v2/contracts/interfaces/ILockedDeal.sol";
+import "poolz-helper-v2/contracts/interfaces/ILockedDealV2.sol";
 import "./VaultData.sol";
 
 /// @title DelayVault core logic
@@ -12,13 +12,13 @@ contract DelayVault is VaultData, ERC20Helper {
     event NewVaultCreated(
         address Token,
         uint256 Amount,
-        uint64 LockTime,
+        uint256 LockTime,
         address Owner
     );
     event LockedPeriodStarted(
         address Token,
         uint256 Amount,
-        uint64 FinishTime,
+        uint256 FinishTime,
         address Owner
     );
 
@@ -38,7 +38,7 @@ contract DelayVault is VaultData, ERC20Helper {
     function CreateVault(
         address _token,
         uint256 _amount,
-        uint64 _lockTime
+        uint256 _lockTime
     ) public whenNotPaused notZeroAddress(_token) isTokenValid(_token) {
         Vault storage vault = VaultMap[_token][msg.sender];
         require(
@@ -67,12 +67,13 @@ contract DelayVault is VaultData, ERC20Helper {
         isVaultNotEmpty(_token)
     {
         Vault storage vault = VaultMap[_token][msg.sender];
-        uint64 finishTime = uint64(block.timestamp) + vault.LockPeriod;
+        uint256 finishTime = block.timestamp + vault.LockPeriod;
         uint256 lockAmount = vault.Amount;
         vault.Amount = 0;
         ApproveAllowanceERC20(_token, LockedDealAddress, lockAmount);
-        ILockedDeal(LockedDealAddress).CreateNewPool(
+        ILockedDealV2(LockedDealAddress).CreateNewPool(
             _token,
+            block.timestamp,
             finishTime,
             lockAmount,
             msg.sender
