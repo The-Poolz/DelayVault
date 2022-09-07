@@ -16,7 +16,6 @@ contract("Delay vault admin settings", (accounts) => {
     })
 
     it("should pause contract", async () => {
-        const startWithdraw = 0
         await instance.Pause()
         const amount = 1000
         const day = 1 * 24 * 60 * 60
