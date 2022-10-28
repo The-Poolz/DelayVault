@@ -27,8 +27,8 @@ contract("Delay vault data", (accounts) => {
     it("should get delay limit", async () => {
         const amounts = [10, 20, 30]
         const lockPeriods = [day, twoDays, threeDays]
-        await instance.setMinDelays(amounts, lockPeriods)
-        const result = await instance.GetDelayLimits()
+        await instance.setMinDelays(tokens[0].address, amounts, lockPeriods)
+        const result = await instance.GetDelayLimits(tokens[0].address)
         assert.equal(result[0].toString(), amounts.toString())
         assert.equal(result[1].toString(), lockPeriods.toString())
     })
@@ -36,27 +36,27 @@ contract("Delay vault data", (accounts) => {
     it("get min delay", async () => {
         const amounts = [250, 500, 10000]
         const lockPeriods = [day, week, twoWeeks]
-        await instance.setMinDelays(amounts, lockPeriods)
-        const mediumDelay = await instance.GetMinDelay(750)
+        await instance.setMinDelays(tokens[0].address, amounts, lockPeriods)
+        const mediumDelay = await instance.GetMinDelay(tokens[0].address, 750)
         assert.equal(mediumDelay.toString(), week.toString())
-        const lowDelay = await instance.GetMinDelay(350)
+        const lowDelay = await instance.GetMinDelay(tokens[0].address, 350)
         assert.equal(lowDelay.toString(), day.toString())
-        const maxDelay = await instance.GetMinDelay(15000)
+        const maxDelay = await instance.GetMinDelay(tokens[0].address, 15000)
         assert.equal(maxDelay.toString(), twoWeeks.toString())
-        const minDelay = await instance.GetMinDelay(100)
+        const minDelay = await instance.GetMinDelay(tokens[0].address, 100)
         assert.equal(minDelay.toString(), "0")
     })
 
     it("should revert when not ordered amount", async () => {
         const amounts = [1000, 500, 10000]
         const lockPeriods = [day, week, twoWeeks]
-        await truffleAssert.reverts(instance.setMinDelays(amounts, lockPeriods), "amounts should be ordered")
+        await truffleAssert.reverts(instance.setMinDelays(tokens[0].address, amounts, lockPeriods), "amounts should be ordered")
     })
 
     it("should revert when not ordered delays", async () => {
         const amounts = [250, 500, 10000]
         const lockPeriods = [day, week, twoDays]
-        await truffleAssert.reverts(instance.setMinDelays(amounts, lockPeriods), "delays should be sorted")
+        await truffleAssert.reverts(instance.setMinDelays(tokens[0].address, amounts, lockPeriods), "delays should be sorted")
     })
 
     it("should get my token addresses", async () => {
