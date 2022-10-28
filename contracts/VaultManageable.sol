@@ -52,7 +52,7 @@ contract VaultManageable is Pausable, GovManager {
         address _token,
         uint256[] memory _amounts,
         uint256[] memory _minDelays
-    ) public onlyOwnerOrGov {
+    ) public onlyOwnerOrGov notZeroAddress(_token) {
         require(_amounts.length == _minDelays.length, "invalid array length");
         require(Array.isArrayOrdered(_amounts), "amounts should be ordered");
         require(Array.isArrayOrdered(_minDelays), "delays should be sorted");
