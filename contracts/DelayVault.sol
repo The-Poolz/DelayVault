@@ -9,27 +9,6 @@ import "./VaultData.sol";
 /// @title DelayVault core logic
 /// @author The-Poolz contract team
 contract DelayVault is VaultData, ERC20Helper {
-    event NewVaultCreated(
-        address Token,
-        uint256 Amount,
-        uint256 LockTime,
-        address Owner
-    );
-    event LockedPeriodStarted(
-        address Token,
-        uint256 Amount,
-        uint256 FinishTime,
-        address Owner
-    );
-
-    modifier isVaultNotEmpty(address _token) {
-        require(
-            VaultMap[_token][msg.sender].Amount > 0,
-            "vault is already empty"
-        );
-        _;
-    }
-
     modifier isTokenValid(address _Token) {
         require(isTokenWhiteListed(_Token), "Need Valid ERC20 Token");
         _;
