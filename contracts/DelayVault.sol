@@ -9,16 +9,11 @@ import "./VaultData.sol";
 /// @title DelayVault core logic
 /// @author The-Poolz contract team
 contract DelayVault is VaultData, ERC20Helper {
-    modifier isTokenValid(address _Token) {
-        require(isTokenWhiteListed(_Token), "Need Valid ERC20 Token");
-        _;
-    }
-
     function CreateVault(
         address _token,
         uint256 _amount,
         uint256 _lockTime
-    ) public whenNotPaused notZeroAddress(_token) isTokenValid(_token) {
+    ) public whenNotPaused notZeroAddress(_token) {
         Vault storage vault = VaultMap[_token][msg.sender];
         require(
             _amount > 0 || _lockTime > vault.LockPeriod,
@@ -29,7 +24,7 @@ contract DelayVault is VaultData, ERC20Helper {
             "can't set a shorter blocking period than the last one"
         );
         require(
-            _lockTime >= GetMinDelay(_amount),
+            _lockTime >= GetMinDelay(_token, _amount),
             "minimum delay greater than lock time"
         );
         TransferInToken(_token, msg.sender, _amount);

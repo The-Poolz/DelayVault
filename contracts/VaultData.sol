@@ -21,26 +21,26 @@ contract VaultData is VaultManageable {
         return Array.KeepNElementsInArray(tokens, index);
     }
 
-    function GetDelayLimits()
+    function GetDelayLimits(address _token)
         public
         view
         returns (uint256[] memory _amount, uint256[] memory _minDelays)
     {
-        return (DelayLimit.Amounts, DelayLimit.MinDelays);
+        return (DelayLimit[_token].Amounts, DelayLimit[_token].MinDelays);
     }
 
-    function GetMinDelay(uint256 _amount) public view returns (uint256 _delay) {
-        if (DelayLimit.Amounts.length == 0 || DelayLimit.Amounts[0] > _amount)
+    function GetMinDelay(address _token, uint256 _amount) public view returns (uint256 _delay) {
+        if (DelayLimit[_token].Amounts.length == 0 || DelayLimit[_token].Amounts[0] > _amount)
             return 0;
         uint256 tempAmount = 0;
-        _delay = DelayLimit.MinDelays[0];
-        for (uint256 i = 0; i < DelayLimit.Amounts.length; i++) {
+        _delay = DelayLimit[_token].MinDelays[0];
+        for (uint256 i = 0; i < DelayLimit[_token].Amounts.length; i++) {
             if (
-                _amount > DelayLimit.Amounts[i] &&
-                tempAmount < DelayLimit.Amounts[i]
+                _amount > DelayLimit[_token].Amounts[i] &&
+                tempAmount < DelayLimit[_token].Amounts[i]
             ) {
-                _delay = DelayLimit.MinDelays[i];
-                tempAmount = DelayLimit.Amounts[i];
+                _delay = DelayLimit[_token].MinDelays[i];
+                tempAmount = DelayLimit[_token].Amounts[i];
             }
         }
     }

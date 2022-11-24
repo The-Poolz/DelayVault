@@ -4,9 +4,7 @@ pragma solidity ^0.8.0;
 /// @title contains modifiers and stores variables.
 contract DelayModifiers {
     address public LockedDealAddress;
-    address public WhiteListAddress;
-    uint256 public WhiteListId;
-    Delay DelayLimit;
+    mapping(address => Delay) DelayLimit; // delay limit for every token
     mapping(address => address[]) public MyTokens;
     mapping(address => mapping(address => Vault)) public VaultMap;
 

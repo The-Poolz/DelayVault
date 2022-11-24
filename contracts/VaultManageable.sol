@@ -18,42 +18,16 @@ contract VaultManageable is Pausable, GovManager, DelayEvents, DelayModifiers {
         LockedDealAddress = _lockedDealAddress;
     }
 
-    function setWhiteListAddress(address _whiteListAddr)
-        public
-        onlyOwnerOrGov
-        uniqueAddress(_whiteListAddr, WhiteListAddress)
-    {
-        WhiteListAddress = _whiteListAddr;
-    }
-
-    function setWhiteListId(uint256 _id)
-        public
-        onlyOwnerOrGov
-        uniqueValue(_id, WhiteListId)
-    {
-        WhiteListId = _id;
-    }
-
-    function isTokenWhiteListed(address _tokenAddress)
-        public
-        view
-        returns (bool)
-    {
-        return
-            WhiteListAddress == address(0) ||
-            WhiteListId == 0 ||
-            IWhiteList(WhiteListAddress).Check(_tokenAddress, WhiteListId) > 0;
-    }
-
     function setMinDelays(
+        address _token,
         uint256[] memory _amounts,
         uint256[] memory _minDelays
-    ) public onlyOwnerOrGov {
+    ) public onlyOwnerOrGov notZeroAddress(_token) {
         require(_amounts.length == _minDelays.length, "invalid array length");
         require(Array.isArrayOrdered(_amounts), "amounts should be ordered");
         require(Array.isArrayOrdered(_minDelays), "delays should be sorted");
-        DelayLimit = Delay(_amounts, _minDelays);
-        emit UpdatedMinDelays(_amounts, _minDelays);
+        DelayLimit[_token] = Delay(_amounts, _minDelays);
+        emit UpdatedMinDelays(_token, _amounts, _minDelays);
     }
 
     function Pause() public onlyOwnerOrGov {

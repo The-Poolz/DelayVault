@@ -15,5 +15,9 @@ contract DelayEvents {
         uint256 FinishTime,
         address Owner
     );
-    event UpdatedMinDelays(uint256[] Amounts, uint256[] MinDelays);
+    event UpdatedMinDelays(
+        address Token,
+        uint256[] Amounts,
+        uint256[] MinDelays
+    );
 }
