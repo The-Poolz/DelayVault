@@ -35,7 +35,6 @@ contract DelayModifiers {
         _;
     }
 
-    
     modifier isVaultNotEmpty(address _token) {
         require(
             VaultMap[_token][msg.sender].Amount > 0,
