@@ -34,6 +34,7 @@ contract VaultManageable is Pausable, GovManager, DelayEvents, DelayModifiers {
         public
         onlyOwnerOrGov
         notZeroAddress(_token)
+        uniqueValue(_startWithdraw, StartWithdrawals[_token])
     {
         StartWithdrawals[_token] = _startWithdraw;
     }
