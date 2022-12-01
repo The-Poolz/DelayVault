@@ -31,7 +31,7 @@ contract DelayVault is VaultData, ERC20Helper {
         vault.Amount += _amount;
         vault.LockPeriod = _lockTime;
         MyTokens[msg.sender].push(_token);
-        emit NewVaultCreated(_token, _amount, _lockTime, msg.sender);
+        emit NewVaultCreated(_token, msg.sender, _amount, _lockTime);
     }
 
     function Withdraw(address _token, uint256 _startWithdraw)
@@ -52,6 +52,6 @@ contract DelayVault is VaultData, ERC20Helper {
             lockAmount,
             msg.sender
         );
-        emit LockedPeriodStarted(_token, lockAmount, finishTime, msg.sender);
+        emit LockedPeriodStarted(_token, msg.sender, lockAmount, finishTime);
     }
 }
