@@ -34,12 +34,13 @@ contract DelayVault is VaultData, ERC20Helper {
         emit NewVaultCreated(_token, _amount, _lockTime, msg.sender);
     }
 
-    function Withdraw(address _token, uint256 _startWithdraw)
+    function Withdraw(address _token)
         public
         notZeroAddress(LockedDealAddress)
         isVaultNotEmpty(_token)
     {
         Vault storage vault = VaultMap[_token][msg.sender];
+        uint256 startTime = block.timestamp + StartWithdrawals[_token];
         uint256 finishTime = block.timestamp + vault.LockPeriod;
         uint256 lockAmount = vault.Amount;
         vault.Amount = 0;
@@ -47,7 +48,7 @@ contract DelayVault is VaultData, ERC20Helper {
         ApproveAllowanceERC20(_token, LockedDealAddress, lockAmount);
         ILockedDealV2(LockedDealAddress).CreateNewPool(
             _token,
-            block.timestamp + _startWithdraw,
+            startTime,
             finishTime,
             lockAmount,
             msg.sender

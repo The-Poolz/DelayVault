@@ -6,6 +6,7 @@ contract DelayModifiers {
     address public LockedDealAddress;
     mapping(address => Delay) DelayLimit; // delay limit for every token
     mapping(address => address[]) public MyTokens;
+    mapping(address => uint256) public StartWithdrawals;
     mapping(address => mapping(address => Vault)) public VaultMap;
 
     struct Vault {
@@ -17,7 +18,7 @@ contract DelayModifiers {
         uint256[] Amounts;
         uint256[] MinDelays;
     }
-    
+
     modifier uniqueValue(uint256 _value, uint256 _oldValue) {
         require(_value != _oldValue, "can't set the same value");
         _;
@@ -40,5 +41,4 @@ contract DelayModifiers {
         );
         _;
     }
-
 }

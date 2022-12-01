@@ -30,6 +30,14 @@ contract VaultManageable is Pausable, GovManager, DelayEvents, DelayModifiers {
         emit UpdatedMinDelays(_token, _amounts, _minDelays);
     }
 
+    function setStartWithdraw(address _token, uint256 _startWithdraw)
+        public
+        onlyOwnerOrGov
+        notZeroAddress(_token)
+    {
+        StartWithdrawals[_token] = _startWithdraw;
+    }
+
     function Pause() public onlyOwnerOrGov {
         _pause();
     }
