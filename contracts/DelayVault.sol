@@ -4,11 +4,11 @@ pragma solidity ^0.8.0;
 import "poolz-helper-v2/contracts/ERC20Helper.sol";
 import "poolz-helper-v2/contracts/ETHHelper.sol";
 import "poolz-helper-v2/contracts/interfaces/ILockedDealV2.sol";
-import "./VaultData.sol";
+import "./DelayView.sol";
 
 /// @title DelayVault core logic
 /// @author The-Poolz contract team
-contract DelayVault is VaultData, ERC20Helper {
+contract DelayVault is DelayView, ERC20Helper {
     function CreateVault(
         address _token,
         uint256 _amount,

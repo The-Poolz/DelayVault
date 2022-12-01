@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "./VaultManageable.sol";
+import "./DelayManageable.sol";
 
-/// @title VaultData - getter view functions
-contract VaultData is VaultManageable {
+/// @title DelayView - getter view functions
+contract DelayView is DelayManageable {
     function GetAllMyTokens() public view returns (address[] memory) {
         return MyTokens[msg.sender];
     }
