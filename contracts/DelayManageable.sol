@@ -9,7 +9,7 @@ import "./DelayModifiers.sol";
 import "./DelayEvents.sol";
 
 /// @title all admin settings
-contract VaultManageable is Pausable, GovManager, DelayEvents, DelayModifiers {
+contract DelayManageable is Pausable, GovManager, DelayEvents, DelayModifiers {
     function setLockedDealAddress(address _lockedDealAddress)
         public
         onlyOwnerOrGov
