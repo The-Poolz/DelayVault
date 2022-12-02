@@ -60,7 +60,10 @@ contract("Delay vault data", (accounts) => {
     })
 
     it("should get my token addresses", async () => {
+        const amounts = [250, 500, 10000]
+        const lockPeriods = [day, week, twoWeeks]
         for (let i = 0; i < tokens.length; i++) {
+            await instance.setMinDelays(tokens[i].address, amounts, lockPeriods)
             await tokens[i].approve(instance.address, amount)
             await instance.CreateVault(tokens[i].address, amount, week)
         }

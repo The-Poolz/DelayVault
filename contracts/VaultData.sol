@@ -29,18 +29,26 @@ contract VaultData is VaultManageable {
         return (DelayLimit[_token].Amounts, DelayLimit[_token].MinDelays);
     }
 
-    function GetMinDelay(address _token, uint256 _amount) public view returns (uint256 _delay) {
-        if (DelayLimit[_token].Amounts.length == 0 || DelayLimit[_token].Amounts[0] > _amount)
+    function GetMinDelay(address _token, uint256 _amount)
+        public
+        view
+        returns (uint256 _delay)
+    {
+        Delay storage delay = DelayLimit[_token];
+        if (delay.Amounts.length == 0) {
+            return type(uint256).max;
+        } else if (delay.Amounts[0] > _amount) {
             return 0;
+        }
         uint256 tempAmount = 0;
-        _delay = DelayLimit[_token].MinDelays[0];
-        for (uint256 i = 0; i < DelayLimit[_token].Amounts.length; i++) {
+        _delay = delay.MinDelays[0];
+        for (uint256 i = 0; i < delay.Amounts.length; i++) {
             if (
-                _amount > DelayLimit[_token].Amounts[i] &&
-                tempAmount < DelayLimit[_token].Amounts[i]
+                _amount > delay.Amounts[i] &&
+                tempAmount < delay.Amounts[i]
             ) {
-                _delay = DelayLimit[_token].MinDelays[i];
-                tempAmount = DelayLimit[_token].Amounts[i];
+                _delay = delay.MinDelays[i];
+                tempAmount = delay.Amounts[i];
             }
         }
     }

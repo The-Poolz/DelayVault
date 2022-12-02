@@ -40,5 +40,4 @@ contract DelayModifiers {
         );
         _;
     }
-
 }

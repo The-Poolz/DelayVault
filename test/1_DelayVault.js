@@ -29,7 +29,7 @@ contract("DelayVault", (accounts) => {
 
     it("should create vault", async () => {
         await token.approve(instance.address, amount)
-        const tx = await instance.CreateVault(token.address, amount, week)
+        const tx = await instance.CreateVault(token.address, amount, week.toString())
         const tokenAddr = tx.logs[tx.logs.length - 1].args.Token
         const quantity = tx.logs[tx.logs.length - 1].args.Amount
         const lockTime = tx.logs[tx.logs.length - 1].args.LockTime
@@ -48,7 +48,6 @@ contract("DelayVault", (accounts) => {
             "can't set a shorter blocking period than the last one"
         )
     })
-
 
     it("should revert when empty vault", async () => {
         const startWithdraw = 0

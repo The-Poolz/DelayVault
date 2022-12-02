@@ -23,6 +23,9 @@ contract("Delay vault admin settings", (accounts) => {
         await token.approve(instance.address, amount)
         await truffleAssert.reverts(instance.CreateVault(token.address, amount, week), "Pausable: paused")
         await instance.Unpause()
+        const amounts = [250, 500, 10000]
+        const lockPeriods = [day, week, week * 2]
+        await instance.setMinDelays(token.address, amounts, lockPeriods)
         await instance.CreateVault(token.address, amount, week)
     })
 
