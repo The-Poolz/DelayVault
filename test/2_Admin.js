@@ -48,6 +48,15 @@ contract("Delay vault admin settings", (accounts) => {
         await truffleAssert.reverts(instance.setMinDelays(_token, amounts, [day, twoDays]), "invalid array length")
     })
 
+    it("should set start withdraw", async () => {
+        const oldStartWithdraw = await instance.StartWithdrawals(token.address)
+        const newStartWithdraw = 3600
+        await instance.setStartWithdraw(token.address, newStartWithdraw)
+        const currentStartWithdraw = await instance.StartWithdrawals(token.address)
+        assert.equal(currentStartWithdraw, newStartWithdraw)
+        assert.notEqual(oldStartWithdraw, currentStartWithdraw)
+    })
+
     it("should revert with the same value", async () => {
         await truffleAssert.reverts(instance.setLockedDealAddress(lockedDealAddr), "can't set the same address")
     })

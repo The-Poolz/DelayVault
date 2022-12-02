@@ -49,11 +49,9 @@ contract("DelayVault", (accounts) => {
         )
     })
 
-
     it("should revert when empty vault", async () => {
-        const startWithdraw = 0
         const token = await TestToken.new("TestToken", "TEST")
         await instance.setLockedDealAddress(accounts[1])
-        await truffleAssert.reverts(instance.Withdraw(token.address, startWithdraw), "vault is already empty")
+        await truffleAssert.reverts(instance.Withdraw(token.address), "vault is already empty")
     })
 })

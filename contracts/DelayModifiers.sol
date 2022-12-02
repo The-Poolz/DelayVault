@@ -27,5 +27,4 @@ contract DelayModifiers is DelayData {
         );
         _;
     }
-
 }
