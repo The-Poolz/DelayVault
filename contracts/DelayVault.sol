@@ -22,7 +22,7 @@ contract DelayVault is DelayView, ERC20Helper {
     {
         Vault storage vault = VaultMap[_token][msg.sender];
         require(
-            _amount < 0 || _lockTime > vault.LockPeriod,
+            _amount > 0 || _lockTime > vault.LockPeriod,
             "amount should be greater than zero"
         );
         require(
