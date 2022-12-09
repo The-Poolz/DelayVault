@@ -17,5 +17,6 @@ contract DelayData {
     struct Delay {
         uint256[] Amounts;
         uint256[] MinDelays;
+        bool isActive;
     }
 }

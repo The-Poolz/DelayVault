@@ -50,17 +50,26 @@ contract("Delay vault data", (accounts) => {
     it("should revert when not ordered amount", async () => {
         const amounts = [1000, 500, 10000]
         const lockPeriods = [day, week, twoWeeks]
-        await truffleAssert.reverts(instance.setMinDelays(tokens[0].address, amounts, lockPeriods), "amounts should be ordered")
+        await truffleAssert.reverts(
+            instance.setMinDelays(tokens[0].address, amounts, lockPeriods),
+            "amounts should be ordered"
+        )
     })
 
     it("should revert when not ordered delays", async () => {
         const amounts = [250, 500, 10000]
         const lockPeriods = [day, week, twoDays]
-        await truffleAssert.reverts(instance.setMinDelays(tokens[0].address, amounts, lockPeriods), "delays should be sorted")
+        await truffleAssert.reverts(
+            instance.setMinDelays(tokens[0].address, amounts, lockPeriods),
+            "delays should be sorted"
+        )
     })
 
     it("should get my token addresses", async () => {
+        const amounts = [amount, amount * 2, amount * 3]
+        const lockPeriods = [week, week * 2, week * 3]
         for (let i = 0; i < tokens.length; i++) {
+            await instance.setMinDelays(tokens[i].address, amounts, lockPeriods)
             await tokens[i].approve(instance.address, amount)
             await instance.CreateVault(tokens[i].address, amount, week)
         }

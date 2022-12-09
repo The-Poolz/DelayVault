@@ -27,4 +27,20 @@ contract DelayModifiers is DelayData {
         );
         _;
     }
+
+    modifier isTokenActive(address _token) {
+        require(
+            DelayLimit[_token].isActive,
+            "there are no limits set for this token"
+        );
+        _;
+    }
+
+    modifier shortLockPeriod(address _token, uint256 _lockPeriod) {
+        require(
+            _lockPeriod >= VaultMap[_token][msg.sender].LockPeriod,
+            "can't set a shorter blocking period than the last one"
+        );
+        _;
+    }
 }

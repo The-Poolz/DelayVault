@@ -54,4 +54,11 @@ contract("DelayVault", (accounts) => {
         await instance.setLockedDealAddress(accounts[1])
         await truffleAssert.reverts(instance.Withdraw(token.address), "vault is already empty")
     })
+
+    it("should revert zero amount", async () => {
+        token = await TestToken.new("TestToken", "TEST")
+        await token.approve(instance.address, amount)
+        await instance.setMinDelays(token.address, amounts, lockPeriods)
+        await truffleAssert.reverts(instance.CreateVault(token.address, "0", "0"), "amount should be greater than zero")
+    })
 })
