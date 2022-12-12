@@ -1,5 +1,7 @@
 # DelayVault
 [![Build Status](https://api.travis-ci.com/The-Poolz/DelayVault.svg?token=qArPwDxVjiye5pPqiscU&branch=master)](https://app.travis-ci.com/github/The-Poolz/DelayVault)
+[![codecov](https://codecov.io/gh/The-Poolz/DelayVault/branch/master/graph/badge.svg)](https://codecov.io/gh/The-Poolz/DelayVault)
+[![CodeFactor](https://www.codefactor.io/repository/github/the-poolz/DelayVault/badge)](https://www.codefactor.io/repository/github/the-poolz/DelayVault)
 
 Smart contract that **pre-locks** tokens indefinitely by creating **Vault**. When the **Vault** is closed by withdrawing tokens, a **Pool** is created for the specified period using a [Locked-Deal](https://github.com/The-Poolz/Locked-pools) contract.
 
