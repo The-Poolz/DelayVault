@@ -6,9 +6,12 @@ const { assert } = require("chai")
 
 contract("Delay vault admin settings", (accounts) => {
     let instance, token
-    const whiteListAddr = accounts[7]
     const lockedDealAddr = accounts[8]
-    const id = 1
+    const amount = 1000
+    const day = 1 * 24 * 60 * 60
+    const week = day * 7
+    const amounts = [amount, amount * 2, amount * 3]
+    const lockPeriods = [day, week, week * 2]
 
     before(async () => {
         instance = await DelayVault.new()
@@ -17,9 +20,7 @@ contract("Delay vault admin settings", (accounts) => {
 
     it("should pause contract", async () => {
         await instance.Pause()
-        const amount = 1000
-        const day = 1 * 24 * 60 * 60
-        const week = day * 7
+        await instance.setMinDelays(token.address, amounts, lockPeriods)
         await token.approve(instance.address, amount)
         await truffleAssert.reverts(instance.CreateVault(token.address, amount, week), "Pausable: paused")
         await instance.Unpause()
@@ -33,7 +34,6 @@ contract("Delay vault admin settings", (accounts) => {
     })
 
     it("should set min delay", async () => {
-        const day = 1 * 24 * 60 * 60
         const twoDays = day * 2
         const threeDays = day * 3
         const amounts = [10, 20, 30]
@@ -59,5 +59,11 @@ contract("Delay vault admin settings", (accounts) => {
 
     it("should revert with the same value", async () => {
         await truffleAssert.reverts(instance.setLockedDealAddress(lockedDealAddr), "can't set the same address")
+    })
+
+    it("should revert when no limits are set for this token", async () => {
+        token = await TestToken.new("TestToken", "TEST")
+        await token.approve(instance.address, amount)
+        await truffleAssert.reverts(instance.CreateVault(token.address, amount, week), "there are no limits set for this token")
     })
 })

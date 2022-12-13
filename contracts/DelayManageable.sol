@@ -26,7 +26,7 @@ contract DelayManageable is Pausable, GovManager, DelayEvents, DelayModifiers {
         require(_amounts.length == _minDelays.length, "invalid array length");
         require(Array.isArrayOrdered(_amounts), "amounts should be ordered");
         require(Array.isArrayOrdered(_minDelays), "delays should be sorted");
-        DelayLimit[_token] = Delay(_amounts, _minDelays);
+        DelayLimit[_token] = Delay(_amounts, _minDelays, true);
         emit UpdatedMinDelays(_token, _amounts, _minDelays);
     }
 

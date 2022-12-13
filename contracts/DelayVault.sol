@@ -13,15 +13,17 @@ contract DelayVault is DelayView, ERC20Helper {
         address _token,
         uint256 _amount,
         uint256 _lockTime
-    ) public whenNotPaused notZeroAddress(_token) {
+    )
+        public
+        whenNotPaused
+        notZeroAddress(_token)
+        isTokenActive(_token)
+        shortLockPeriod(_token, _lockTime)
+    {
         Vault storage vault = VaultMap[_token][msg.sender];
         require(
             _amount > 0 || _lockTime > vault.LockPeriod,
             "amount should be greater than zero"
-        );
-        require(
-            _lockTime >= vault.LockPeriod,
-            "can't set a shorter blocking period than the last one"
         );
         require(
             _lockTime >= GetMinDelay(_token, _amount),
