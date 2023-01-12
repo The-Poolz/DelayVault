@@ -12,6 +12,7 @@ contract("Delay vault admin settings", (accounts) => {
     const week = day * 7
     const amounts = [amount, amount * 2, amount * 3]
     const lockPeriods = [day, week, week * 2]
+    const cliffTimes = [day, week, week * 2]
 
     before(async () => {
         instance = await DelayVault.new()
@@ -20,7 +21,7 @@ contract("Delay vault admin settings", (accounts) => {
 
     it("should pause contract", async () => {
         await instance.Pause()
-        await instance.setMinDelays(token.address, amounts, lockPeriods)
+        await instance.setMinDelays(token.address, amounts, lockPeriods, cliffTimes)
         await token.approve(instance.address, amount)
         await truffleAssert.reverts(instance.CreateVault(token.address, amount, week), "Pausable: paused")
         await instance.Unpause()
@@ -38,14 +39,19 @@ contract("Delay vault admin settings", (accounts) => {
         const threeDays = day * 3
         const amounts = [10, 20, 30]
         const lockPeriods = [day, twoDays, threeDays]
-        const tx = await instance.setMinDelays(token.address, amounts, lockPeriods)
+        const tx = await instance.setMinDelays(token.address, amounts, lockPeriods, cliffTimes)
         const resAmounts = tx.logs[0].args.Amounts
-        const MinDelays = tx.logs[0].args.MinDelays
+        const minDelays = tx.logs[0].args.MinDelays
+        const cliffArray = tx.logs[0].args.CliffTimes
         const _token = tx.logs[0].args.Token
         assert.equal(amounts.toString(), resAmounts.toString())
-        assert.equal(lockPeriods.toString(), MinDelays.toString())
+        assert.equal(lockPeriods.toString(), minDelays.toString())
+        assert.equal(cliffArray.toString(), cliffTimes.toString())
         assert.equal(_token.toString(), token.address.toString())
-        await truffleAssert.reverts(instance.setMinDelays(_token, amounts, [day, twoDays]), "invalid array length")
+        await truffleAssert.reverts(
+            instance.setMinDelays(_token, amounts, [day, twoDays], [day, twoDays]),
+            "invalid array length"
+        )
     })
 
     it("should set start withdraw", async () => {
@@ -64,6 +70,9 @@ contract("Delay vault admin settings", (accounts) => {
     it("should revert when no limits are set for this token", async () => {
         token = await TestToken.new("TestToken", "TEST")
         await token.approve(instance.address, amount)
-        await truffleAssert.reverts(instance.CreateVault(token.address, amount, week), "there are no limits set for this token")
+        await truffleAssert.reverts(
+            instance.CreateVault(token.address, amount, week),
+            "there are no limits set for this token"
+        )
     })
 })

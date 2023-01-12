@@ -44,6 +44,7 @@ contract DelayVault is DelayView, ERC20Helper {
         Vault storage vault = VaultMap[_token][msg.sender];
         uint256 startTime = block.timestamp + StartWithdrawals[_token];
         uint256 finishTime = block.timestamp + vault.LockPeriod;
+        uint256 cliffTime = GetCliffTime(_token, vault.LockPeriod);
         uint256 lockAmount = vault.Amount;
         vault.Amount = 0;
         vault.LockPeriod = 0;
@@ -51,6 +52,7 @@ contract DelayVault is DelayView, ERC20Helper {
         ILockedDealV2(LockedDealAddress).CreateNewPool(
             _token,
             startTime,
+            cliffTime,
             finishTime,
             lockAmount,
             msg.sender

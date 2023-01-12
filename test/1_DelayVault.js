@@ -12,6 +12,7 @@ contract("DelayVault", (accounts) => {
     const week = day * 7
     const amounts = [10, 30, 1000]
     const lockPeriods = [day, twoDays, week]
+    const cliffTimes = [day, twoDays, week]
 
     before(async () => {
         instance = await DelayVault.new()
@@ -19,7 +20,7 @@ contract("DelayVault", (accounts) => {
     })
 
     it("should revert invalid blocking period", async () => {
-        await instance.setMinDelays(token.address, amounts, lockPeriods)
+        await instance.setMinDelays(token.address, amounts, lockPeriods, cliffTimes)
         await token.approve(instance.address, amount)
         await truffleAssert.reverts(
             instance.CreateVault(token.address, amount, day),
@@ -41,7 +42,7 @@ contract("DelayVault", (accounts) => {
     })
 
     it("should revert shorter blocking period than the last one", async () => {
-        await instance.setMinDelays(token.address, amounts, lockPeriods)
+        await instance.setMinDelays(token.address, amounts, lockPeriods, cliffTimes)
         await token.approve(instance.address, amount)
         await truffleAssert.reverts(
             instance.CreateVault(token.address, amount, day),
@@ -58,7 +59,7 @@ contract("DelayVault", (accounts) => {
     it("should revert zero amount", async () => {
         token = await TestToken.new("TestToken", "TEST")
         await token.approve(instance.address, amount)
-        await instance.setMinDelays(token.address, amounts, lockPeriods)
+        await instance.setMinDelays(token.address, amounts, lockPeriods, cliffTimes)
         await truffleAssert.reverts(instance.CreateVault(token.address, "0", "0"), "amount should be greater than zero")
     })
 })
