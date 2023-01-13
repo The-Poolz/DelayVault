@@ -56,6 +56,7 @@ contract DelayView is DelayManageable {
         view
         returns (uint256 _cliffTime)
     {
+        if (DelayLimit[_token].MinDelays[0] > _delay) return 0;
         uint256 tempDelay = 0;
         _cliffTime = DelayLimit[_token].CliffTimes[0];
         for (uint256 i = 0; i < DelayLimit[_token].Amounts.length; i++) {

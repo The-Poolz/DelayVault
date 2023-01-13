@@ -11,10 +11,10 @@ contract("Delay vault data", (accounts) => {
     let addresses = []
     const day = 1 * 24 * 60 * 60
     const twoDays = day * 2
-    const threeDays = day * 3
     const week = day * 7
     const twoWeeks = day * 14
     const cliffTimes = [day, twoDays, week]
+    const lockPeriods = [day, twoDays, week]
 
     before(async () => {
         instance = await DelayVault.new()
@@ -27,7 +27,6 @@ contract("Delay vault data", (accounts) => {
 
     it("should get delay limit", async () => {
         const amounts = [10, 20, 30]
-        const lockPeriods = [day, twoDays, threeDays]
         await instance.setMinDelays(tokens[0].address, amounts, lockPeriods, cliffTimes)
         const result = await instance.GetDelayLimits(tokens[0].address)
         assert.equal(result[0].toString(), amounts.toString())
@@ -35,17 +34,45 @@ contract("Delay vault data", (accounts) => {
     })
 
     it("get min delay", async () => {
-        const amounts = [250, 500, 10000]
+        // amounts limits
+        // _________________________________
+        // 0 - 249          | no limit      |
+        // 250 - 999        | first limit   |
+        // 1000 - 19999     | second limit  |
+        // 2000 - infinity  | third limit   |
+        //```````````````````````````````````
+        const amounts = [250, 1000, 20000]
         const lockPeriods = [day, week, twoWeeks]
         await instance.setMinDelays(tokens[0].address, amounts, lockPeriods, cliffTimes)
-        const mediumDelay = await instance.GetMinDelay(tokens[0].address, 750)
-        assert.equal(mediumDelay.toString(), week.toString())
-        const lowDelay = await instance.GetMinDelay(tokens[0].address, 350)
-        assert.equal(lowDelay.toString(), day.toString())
-        const maxDelay = await instance.GetMinDelay(tokens[0].address, 15000)
+        const dayDelay = await instance.GetMinDelay(tokens[0].address, 250)
+        assert.equal(dayDelay.toString(), day.toString())
+        const zeroDelay = await instance.GetMinDelay(tokens[0].address, 249)
+        assert.equal(zeroDelay.toString(), 0)
+        const weekDelay = await instance.GetMinDelay(tokens[0].address, 1100)
+        assert.equal(weekDelay.toString(), week.toString())
+        const maxDelay = await instance.GetMinDelay(tokens[0].address, 20000)
         assert.equal(maxDelay.toString(), twoWeeks.toString())
-        const minDelay = await instance.GetMinDelay(tokens[0].address, 100)
-        assert.equal(minDelay.toString(), "0")
+    })
+
+    it("get cliff time", async () => {
+        // min delays limits
+        // _________________________________
+        // 0 - day-1        | no limit      |
+        // day - twoDays-1  | first limit   |
+        // twoDays - week-1 | second limit  |
+        // week - inifinity | third limit   |
+        //```````````````````````````````````
+        const amounts = [250, 1000, 20000]
+        await instance.setMinDelays(tokens[0].address, amounts, lockPeriods, cliffTimes)
+        const dayCliffTime = await instance.GetCliffTime(tokens[0].address, day)
+        assert.equal(dayCliffTime.toString(), day.toString())
+        const twoDaysCliffTime = await instance.GetCliffTime(tokens[0].address, twoDays + day)
+        assert.equal(twoDaysCliffTime.toString(), twoDays.toString())
+        const maxCliffTime = await instance.GetCliffTime(tokens[0].address, week * 2)
+        assert.equal(maxCliffTime.toString(), week.toString())
+        const halfDay = day / 2
+        const zeroCliffTime = await instance.GetCliffTime(tokens[0].address, halfDay)
+        assert.equal(zeroCliffTime.toString(), 0)
     })
 
     it("should revert when not ordered amount", async () => {
