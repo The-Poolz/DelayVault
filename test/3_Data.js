@@ -39,7 +39,7 @@ contract("Delay vault data", (accounts) => {
         // 0 - 249          | no limit      |
         // 250 - 999        | first limit   |
         // 1000 - 19999     | second limit  |
-        // 2000 - infinity  | third limit   |
+        // 20000 - infinity | third limit   |
         //```````````````````````````````````
         const amounts = [250, 1000, 20000]
         const lockPeriods = [day, week, twoWeeks]
