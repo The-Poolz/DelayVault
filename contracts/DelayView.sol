@@ -29,18 +29,43 @@ contract DelayView is DelayManageable {
         return (DelayLimit[_token].Amounts, DelayLimit[_token].MinDelays);
     }
 
-    function GetMinDelay(address _token, uint256 _amount) public view returns (uint256 _delay) {
-        if (DelayLimit[_token].Amounts.length == 0 || DelayLimit[_token].Amounts[0] > _amount)
-            return 0;
+    function GetMinDelay(address _token, uint256 _amount)
+        public
+        view
+        returns (uint256 _delay)
+    {
+        if (
+            DelayLimit[_token].Amounts.length == 0 ||
+            DelayLimit[_token].Amounts[0] > _amount
+        ) return 0;
         uint256 tempAmount = 0;
         _delay = DelayLimit[_token].MinDelays[0];
         for (uint256 i = 0; i < DelayLimit[_token].Amounts.length; i++) {
             if (
-                _amount > DelayLimit[_token].Amounts[i] &&
+                _amount >= DelayLimit[_token].Amounts[i] &&
                 tempAmount < DelayLimit[_token].Amounts[i]
             ) {
                 _delay = DelayLimit[_token].MinDelays[i];
                 tempAmount = DelayLimit[_token].Amounts[i];
+            }
+        }
+    }
+
+    function GetCliffTime(address _token, uint256 _delay)
+        public
+        view
+        returns (uint256 _cliffTime)
+    {
+        if (DelayLimit[_token].MinDelays[0] > _delay) return 0;
+        uint256 tempDelay = 0;
+        _cliffTime = DelayLimit[_token].CliffTimes[0];
+        for (uint256 i = 0; i < DelayLimit[_token].Amounts.length; i++) {
+            if (
+                _delay >= DelayLimit[_token].MinDelays[i] &&
+                tempDelay < DelayLimit[_token].MinDelays[i]
+            ) {
+                _cliffTime = DelayLimit[_token].CliffTimes[i];
+                tempDelay = DelayLimit[_token].MinDelays[i];
             }
         }
     }

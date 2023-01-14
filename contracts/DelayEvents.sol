@@ -18,6 +18,7 @@ contract DelayEvents {
     event UpdatedMinDelays(
         address indexed Token,
         uint256[] Amounts,
-        uint256[] MinDelays
+        uint256[] MinDelays,
+        uint256[] CliffTimes
     );
 }
