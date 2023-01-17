@@ -101,9 +101,29 @@ contract("Delay vault data", (accounts) => {
             await tokens[i].approve(instance.address, amount)
             await instance.CreateVault(tokens[i].address, amount, week)
         }
-        const allMyTokens = await instance.GetAllMyTokens()
-        const myTokens = await instance.GetMyTokens()
+        const allMyTokens = await instance.GetAllMyTokens(accounts[0])
+        const myTokens = await instance.GetMyTokens(accounts[0])
         assert.equal(allMyTokens.toString(), addresses.toString())
         assert.equal(myTokens.toString(), addresses.toString())
+    })
+
+    it("should get all data from vault", async () => {
+        const amounts = [amount, amount * 2, amount * 3]
+        const lockPeriods = [week, week * 2, week * 3]
+        const token = await TestToken.new("TestToken", "TEST")
+        await instance.setMinDelays(token.address, amounts, lockPeriods, cliffTimes)
+        const users = [accounts[2], accounts[1]]
+        await token.transfer(users[0], amount)
+        await token.approve(instance.address, amount, { from: users[0] })
+        await token.transfer(users[1], amount)
+        await token.approve(instance.address, amount, { from: users[1] })
+        await instance.CreateVault(token.address, amount, week, { from: users[0] })
+        await instance.CreateVault(token.address, amount, week, { from: users[1] })
+        const allData = await instance.GetAllUsersData(token.address)
+        assert.equal(allData.length, users.length)
+        assert.equal(allData[0].User, users[0], "check first user address")
+        assert.equal(allData[1].User, users[1], "check second user address")
+        assert.equal(allData[0].Amount, amount, "check first user amount")
+        assert.equal(allData[1].Amount, amount, "check second user amount")
     })
 })

@@ -5,16 +5,36 @@ import "./DelayManageable.sol";
 
 /// @title DelayView - getter view functions
 contract DelayView is DelayManageable {
-    function GetAllMyTokens() public view returns (address[] memory) {
-        return MyTokens[msg.sender];
+    function GetUserData(address _token, address _user)
+        public
+        view
+        returns (Vault memory)
+    {
+        return VaultMap[_token][VaultId[_user] - 1];
     }
 
-    function GetMyTokens() public view returns (address[] memory) {
-        address[] storage allTokens = MyTokens[msg.sender];
+    function GetAllUsersData(address _token)
+        public
+        view
+        returns (Vault[] memory)
+    {
+        return VaultMap[_token];
+    }
+
+    function GetAllMyTokens(address _user)
+        public
+        view
+        returns (address[] memory)
+    {
+        return MyTokens[_user];
+    }
+
+    function GetMyTokens(address _user) public view returns (address[] memory) {
+        address[] storage allTokens = MyTokens[_user];
         address[] memory tokens = new address[](allTokens.length);
         uint256 index;
         for (uint256 i = 0; i < allTokens.length; i++) {
-            if (VaultMap[allTokens[i]][msg.sender].Amount > 0) {
+            if (VaultMap[allTokens[i]][VaultId[_user] - 1].Amount > 0) {
                 tokens[index++] = allTokens[i];
             }
         }
