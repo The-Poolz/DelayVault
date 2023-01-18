@@ -15,6 +15,7 @@ contract("Delay vault data", (accounts) => {
     const twoWeeks = day * 14
     const cliffTimes = [day, twoDays, week]
     const lockPeriods = [day, twoDays, week]
+    const amounts = [250, 1000, 20000]
 
     before(async () => {
         instance = await DelayVault.new()
@@ -41,7 +42,6 @@ contract("Delay vault data", (accounts) => {
         // 1000 - 19999     | second limit  |
         // 20000 - infinity | third limit   |
         //```````````````````````````````````
-        const amounts = [250, 1000, 20000]
         const lockPeriods = [day, week, twoWeeks]
         await instance.setMinDelays(tokens[0].address, amounts, lockPeriods, cliffTimes)
         const dayDelay = await instance.GetMinDelay(tokens[0].address, 250)
@@ -62,7 +62,6 @@ contract("Delay vault data", (accounts) => {
         // twoDays - week-1 | second limit  |
         // week - inifinity | third limit   |
         //```````````````````````````````````
-        const amounts = [250, 1000, 20000]
         await instance.setMinDelays(tokens[0].address, amounts, lockPeriods, cliffTimes)
         const dayCliffTime = await instance.GetCliffTime(tokens[0].address, day)
         assert.equal(dayCliffTime.toString(), day.toString())
@@ -85,7 +84,6 @@ contract("Delay vault data", (accounts) => {
     })
 
     it("should revert when not ordered delays", async () => {
-        const amounts = [250, 500, 10000]
         const lockPeriods = [day, week, twoDays]
         await truffleAssert.reverts(
             instance.setMinDelays(tokens[0].address, amounts, lockPeriods, cliffTimes),
@@ -101,29 +99,28 @@ contract("Delay vault data", (accounts) => {
             await tokens[i].approve(instance.address, amount)
             await instance.CreateVault(tokens[i].address, amount, week)
         }
-        const allMyTokens = await instance.GetAllMyTokens(accounts[0])
-        const myTokens = await instance.GetMyTokens(accounts[0])
+        const allMyTokens = await instance.GetAllMyTokens()
+        const myTokens = await instance.GetMyTokens()
         assert.equal(allMyTokens.toString(), addresses.toString())
         assert.equal(myTokens.toString(), addresses.toString())
     })
 
-    it("should get all data from vault", async () => {
-        const amounts = [amount, amount * 2, amount * 3]
-        const lockPeriods = [week, week * 2, week * 3]
-        const token = await TestToken.new("TestToken", "TEST")
+    it("should return all data", async () => {
+        //create token
+        token = await TestToken.new("Poolz", "$POOLZ")
         await instance.setMinDelays(token.address, amounts, lockPeriods, cliffTimes)
-        const users = [accounts[2], accounts[1]]
-        await token.transfer(users[0], amount)
-        await token.approve(instance.address, amount, { from: users[0] })
-        await token.transfer(users[1], amount)
-        await token.approve(instance.address, amount, { from: users[1] })
-        await instance.CreateVault(token.address, amount, week, { from: users[0] })
-        await instance.CreateVault(token.address, amount, week, { from: users[1] })
-        const allData = await instance.GetAllUsersData(token.address)
-        assert.equal(allData.length, users.length)
-        assert.equal(allData[0].User, users[0], "check first user address")
-        assert.equal(allData[1].User, users[1], "check second user address")
-        assert.equal(allData[0].Amount, amount, "check first user amount")
-        assert.equal(allData[1].Amount, amount, "check second user amount")
+        //create vaults
+        for (let i = 0; i < accounts.length; i++) {
+            await token.transfer(accounts[i], amount)
+            await token.approve(instance.address, amount, { from: accounts[i] })
+            await instance.CreateVault(token.address, amount, week, { from: accounts[i] })
+        }
+        const data = await instance.GetAllUsersData(token.address)
+        assert.equal(data[0].length, data[1].length)
+        assert.equal(data[0].length, accounts.length)
+        for (let i = 0; i < accounts.length; i++) {
+            assert.equal(data[0][i], accounts[i])
+            assert.equal(data[1][i][0], amount)
+        }
     })
 })

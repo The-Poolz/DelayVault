@@ -7,11 +7,10 @@ contract DelayData {
     mapping(address => Delay) DelayLimit; // delay limit for every token
     mapping(address => address[]) public MyTokens;
     mapping(address => uint256) public StartWithdrawals;
-    mapping(address => Vault[]) public VaultMap;
-    mapping(address => uint256) public VaultId;
+    mapping(address => mapping(address => Vault)) public VaultMap;
+    mapping(address => address[]) public Users;
 
     struct Vault {
-        address User;
         uint256 Amount;
         uint256 LockPeriod;
     }
