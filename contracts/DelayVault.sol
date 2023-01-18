@@ -32,6 +32,9 @@ contract DelayVault is DelayView, ERC20Helper {
         TransferInToken(_token, msg.sender, _amount);
         vault.Amount += _amount;
         vault.LockPeriod = _lockTime;
+        if (!Array.isInArray(Users[_token], msg.sender)) {
+            Users[_token].push(msg.sender);
+        }
         MyTokens[msg.sender].push(_token);
         emit NewVaultCreated(_token, msg.sender, _amount, _lockTime);
     }

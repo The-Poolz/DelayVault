@@ -8,6 +8,7 @@ contract DelayData {
     mapping(address => address[]) public MyTokens;
     mapping(address => uint256) public StartWithdrawals;
     mapping(address => mapping(address => Vault)) public VaultMap;
+    mapping(address => address[]) public Users;
 
     struct Vault {
         uint256 Amount;
