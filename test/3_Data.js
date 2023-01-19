@@ -99,8 +99,8 @@ contract("Delay vault data", (accounts) => {
             await tokens[i].approve(instance.address, amount)
             await instance.CreateVault(tokens[i].address, amount, week)
         }
-        const allMyTokens = await instance.GetAllMyTokens()
-        const myTokens = await instance.GetMyTokens()
+        const allMyTokens = await instance.GetAllMyTokens(accounts[0])
+        const myTokens = await instance.GetMyTokens(accounts[0])
         assert.equal(allMyTokens.toString(), addresses.toString())
         assert.equal(myTokens.toString(), addresses.toString())
     })
