@@ -36,7 +36,7 @@ contract DelayVault is DelayView, ERC20Helper {
             Users[_token].push(msg.sender);
         }
         MyTokens[msg.sender].push(_token);
-        emit NewVaultCreated(_token, msg.sender, _amount, _lockTime);
+        emit NewVaultCreated(_token, msg.sender, vault.Amount, _lockTime);
     }
 
     function Withdraw(address _token)
