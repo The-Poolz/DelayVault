@@ -17,16 +17,20 @@ contract DelayView is DelayManageable {
         return (Users[_token], _vaults);
     }
 
-    function GetAllMyTokens() public view returns (address[] memory) {
-        return MyTokens[msg.sender];
+    function GetAllMyTokens(address _user)
+        public
+        view
+        returns (address[] memory)
+    {
+        return MyTokens[_user];
     }
 
-    function GetMyTokens() public view returns (address[] memory) {
-        address[] storage allTokens = MyTokens[msg.sender];
+    function GetMyTokens(address _user) public view returns (address[] memory) {
+        address[] storage allTokens = MyTokens[_user];
         address[] memory tokens = new address[](allTokens.length);
         uint256 index;
         for (uint256 i = 0; i < allTokens.length; i++) {
-            if (VaultMap[allTokens[i]][msg.sender].Amount > 0) {
+            if (VaultMap[allTokens[i]][_user].Amount > 0) {
                 tokens[index++] = allTokens[i];
             }
         }
