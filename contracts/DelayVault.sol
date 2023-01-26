@@ -36,6 +36,7 @@ contract DelayVault is DelayView, ERC20Helper {
             Users[_token].push(msg.sender);
         }
         MyTokens[msg.sender].push(_token);
+        VaultMap[msg.sender][_token] = vault; // populate mapping in the reverse direction 
         emit NewVaultCreated(_token, msg.sender, vault.Amount, _lockTime);
     }
 
