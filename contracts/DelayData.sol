@@ -6,7 +6,6 @@ contract DelayData {
     address public LockedDealAddress;
     mapping(address => Delay) DelayLimit; // delay limit for every token
     mapping(address => address[]) public MyTokens;
-    mapping(address => uint256) public StartWithdrawals;
     mapping(address => mapping(address => Vault)) public VaultMap;
     mapping(address => address[]) public Users;
 
