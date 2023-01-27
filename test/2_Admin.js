@@ -75,4 +75,16 @@ contract("Delay vault admin settings", (accounts) => {
             "there are no limits set for this token"
         )
     })
+
+    it("should deactivate/activate token", async () => {
+        await instance.setMinDelays(token.address, amounts, lockPeriods, cliffTimes) // isActive = true
+        await token.approve(instance.address, amount)
+        await instance.swapTokenStatusFilter(token.address) // isActive = false
+        await truffleAssert.reverts(
+            instance.CreateVault(token.address, amount, week),
+            "there are no limits set for this token"
+        )
+        await instance.swapTokenStatusFilter(token.address) // isActive = true
+        await truffleAssert.passes(instance.CreateVault(token.address, amount, week))
+    })
 })

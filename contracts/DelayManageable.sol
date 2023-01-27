@@ -40,6 +40,14 @@ contract DelayManageable is Pausable, GovManager, DelayEvents, DelayModifiers {
         StartWithdrawals[_token] = _startWithdraw;
     }
 
+    function swapTokenStatusFilter(address _token)
+        public
+        onlyOwnerOrGov
+        notZeroAddress(_token)
+    {
+        DelayLimit[_token].isActive = !DelayLimit[_token].isActive;
+    }
+
     function Pause() public onlyOwnerOrGov {
         _pause();
     }
