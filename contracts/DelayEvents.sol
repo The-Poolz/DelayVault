@@ -3,17 +3,11 @@ pragma solidity ^0.8.0;
 
 /// @title contains all events.
 contract DelayEvents {
-    event NewVaultCreated(
+    event VaultValueChanged(
         address indexed Token,
         address indexed Owner,
         uint256 Amount,
         uint256 LockTime
-    );
-    event LockedPeriodStarted(
-        address indexed Token,
-        address indexed Owner,
-        uint256 Amount,
-        uint256 FinishTime
     );
     event UpdatedMinDelays(
         address indexed Token,
