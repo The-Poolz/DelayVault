@@ -5,11 +5,6 @@ import "./DelayData.sol";
 
 /// @title contains modifiers and stores variables.
 contract DelayModifiers is DelayData {
-    modifier uniqueValue(uint256 _value, uint256 _oldValue) {
-        require(_value != _oldValue, "can't set the same value");
-        _;
-    }
-
     modifier uniqueAddress(address _addr, address _oldAddr) {
         require(_addr != _oldAddr, "can't set the same address");
         _;
