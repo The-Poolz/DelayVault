@@ -31,13 +31,12 @@ contract DelayManageable is Pausable, GovManager, DelayEvents, DelayModifiers {
         emit UpdatedMinDelays(_token, _amounts, _minDelays, _cliffTimes);
     }
 
-    function setStartWithdraw(address _token, uint256 _startWithdraw)
+    function swapTokenStatusFilter(address _token)
         public
         onlyOwnerOrGov
         notZeroAddress(_token)
-        uniqueValue(_startWithdraw, StartWithdrawals[_token])
     {
-        StartWithdrawals[_token] = _startWithdraw;
+        DelayLimit[_token].isActive = !DelayLimit[_token].isActive;
     }
 
     function Pause() public onlyOwnerOrGov {

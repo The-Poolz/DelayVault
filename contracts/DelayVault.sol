@@ -37,7 +37,7 @@ contract DelayVault is DelayView, ERC20Helper {
         }
         MyTokens[msg.sender].push(_token);
         VaultMap[msg.sender][_token] = vault; // populate mapping in the reverse direction 
-        emit NewVaultCreated(_token, msg.sender, vault.Amount, _lockTime);
+        emit VaultValueChanged(_token, msg.sender, vault.Amount, _lockTime);
     }
 
     function Withdraw(address _token)
@@ -46,7 +46,6 @@ contract DelayVault is DelayView, ERC20Helper {
         isVaultNotEmpty(_token)
     {
         Vault storage vault = VaultMap[_token][msg.sender];
-        uint256 startTime = block.timestamp + StartWithdrawals[_token];
         uint256 finishTime = block.timestamp + vault.LockPeriod;
         uint256 cliffTime = GetCliffTime(_token, vault.LockPeriod);
         uint256 lockAmount = vault.Amount;
@@ -55,12 +54,12 @@ contract DelayVault is DelayView, ERC20Helper {
         ApproveAllowanceERC20(_token, LockedDealAddress, lockAmount);
         ILockedDealV2(LockedDealAddress).CreateNewPool(
             _token,
-            startTime,
+            block.timestamp,
             cliffTime,
             finishTime,
             lockAmount,
             msg.sender
         );
-        emit LockedPeriodStarted(_token, msg.sender, lockAmount, finishTime);
+        emit VaultValueChanged(_token, msg.sender, 0, 0);
     }
 }

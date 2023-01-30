@@ -54,15 +54,6 @@ contract("Delay vault admin settings", (accounts) => {
         )
     })
 
-    it("should set start withdraw", async () => {
-        const oldStartWithdraw = await instance.StartWithdrawals(token.address)
-        const newStartWithdraw = 3600
-        await instance.setStartWithdraw(token.address, newStartWithdraw)
-        const currentStartWithdraw = await instance.StartWithdrawals(token.address)
-        assert.equal(currentStartWithdraw, newStartWithdraw)
-        assert.notEqual(oldStartWithdraw, currentStartWithdraw)
-    })
-
     it("should revert with the same value", async () => {
         await truffleAssert.reverts(instance.setLockedDealAddress(lockedDealAddr), "can't set the same address")
     })
@@ -74,5 +65,17 @@ contract("Delay vault admin settings", (accounts) => {
             instance.CreateVault(token.address, amount, week),
             "there are no limits set for this token"
         )
+    })
+
+    it("should deactivate/activate token", async () => {
+        await instance.setMinDelays(token.address, amounts, lockPeriods, cliffTimes) // isActive = true
+        await token.approve(instance.address, amount)
+        await instance.swapTokenStatusFilter(token.address) // isActive = false
+        await truffleAssert.reverts(
+            instance.CreateVault(token.address, amount, week),
+            "there are no limits set for this token"
+        )
+        await instance.swapTokenStatusFilter(token.address) // isActive = true
+        await truffleAssert.passes(instance.CreateVault(token.address, amount, week))
     })
 })
