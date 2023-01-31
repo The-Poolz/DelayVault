@@ -2,6 +2,7 @@
 pragma solidity ^0.8.0;
 
 import "./DelayData.sol";
+import "poolz-helper-v2/contracts/Array.sol";
 
 /// @title contains modifiers and stores variables.
 contract DelayModifiers is DelayData {
@@ -36,6 +37,16 @@ contract DelayModifiers is DelayData {
             _lockPeriod >= VaultMap[_token][msg.sender].LockPeriod,
             "can't set a shorter blocking period than the last one"
         );
+        _;
+    }
+
+    modifier sameArrayLength(uint256 _fLength, uint256 _sLength) {
+        require(_fLength == _sLength, "invalid array length");
+        _;
+    }
+
+    modifier orderedArray(uint256[] memory _array) {
+        require(Array.isArrayOrdered(_array), "array should be ordered");
         _;
     }
 }

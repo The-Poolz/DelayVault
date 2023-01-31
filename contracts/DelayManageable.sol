@@ -4,7 +4,6 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "poolz-helper-v2/contracts/GovManager.sol";
 import "poolz-helper-v2/contracts/interfaces/IWhiteList.sol";
-import "poolz-helper-v2/contracts/Array.sol";
 import "./DelayModifiers.sol";
 import "./DelayEvents.sol";
 
@@ -23,10 +22,16 @@ contract DelayManageable is Pausable, GovManager, DelayEvents, DelayModifiers {
         uint256[] memory _amounts,
         uint256[] memory _minDelays,
         uint256[] memory _cliffTimes
-    ) public onlyOwnerOrGov notZeroAddress(_token) {
-        require(_amounts.length == _minDelays.length, "invalid array length");
-        require(Array.isArrayOrdered(_amounts), "amounts should be ordered");
-        require(Array.isArrayOrdered(_minDelays), "delays should be sorted");
+    )
+        public
+        onlyOwnerOrGov
+        notZeroAddress(_token)
+        sameArrayLength(_amounts.length, _minDelays.length)
+        sameArrayLength(_cliffTimes.length, _minDelays.length)
+        orderedArray(_amounts)
+        orderedArray(_minDelays)
+        orderedArray(_cliffTimes)
+    {
         DelayLimit[_token] = Delay(_amounts, _minDelays, _cliffTimes, true);
         emit UpdatedMinDelays(_token, _amounts, _minDelays, _cliffTimes);
     }

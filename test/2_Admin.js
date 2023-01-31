@@ -48,8 +48,22 @@ contract("Delay vault admin settings", (accounts) => {
         assert.equal(lockPeriods.toString(), minDelays.toString())
         assert.equal(cliffArray.toString(), cliffTimes.toString())
         assert.equal(_token.toString(), token.address.toString())
+    })
+
+    it("should revert arrays with dirrent lengths", async () => {
+        const invalidCliffTimes = [day, week]
         await truffleAssert.reverts(
-            instance.setMinDelays(_token, amounts, [day, twoDays], [day, twoDays]),
+            instance.setMinDelays(token.address, amounts, lockPeriods, invalidCliffTimes),
+            "invalid array length"
+        )
+        const invalidLockPeriods = [day, week]
+        await truffleAssert.reverts(
+            instance.setMinDelays(token.address, amounts, invalidLockPeriods, cliffTimes),
+            "invalid array length"
+        )
+        const invalidAmounts = [10, 20, 30, 50]
+        await truffleAssert.reverts(
+            instance.setMinDelays(token.address, invalidAmounts, invalidLockPeriods, cliffTimes),
             "invalid array length"
         )
     })
