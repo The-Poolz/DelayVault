@@ -35,13 +35,13 @@ contract("Delay vault data", (accounts) => {
     })
 
     it("get min delay", async () => {
-        // amounts            start times
-        // ___________________________________________________
-        // 0 - 249          |0 - day-1        | no limit      |
-        // 250 - 999        |day - twoDays-1  | first limit   |
-        // 1000 - 19999     |twoDays - week-1 | second limit  |
-        // 20000 - infinity |week - inifinity | third limit   |
-        //````````````````````````````````````````````````````
+        // amounts            lock periods
+        // ______________________________________________________
+        // 0 - 249          |0 - day-1           | no limit      |
+        // 250 - 999        |day - week-1        | first limit   |
+        // 1000 - 19999     |week - twoWeeks-1   | second limit  |
+        // 20000 - infinity |twoWeeks - inifinity| third limit   |
+        //```````````````````````````````````````````````````````
         const lockPeriods = [day, week, twoWeeks]
         await instance.setMinDelays(tokens[0].address, amounts, lockPeriods, cliffTimes)
         const dayDelay = await instance.GetMinDelay(tokens[0].address, amounts[0])
