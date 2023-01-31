@@ -26,8 +26,8 @@ contract DelayManageable is Pausable, GovManager, DelayEvents, DelayModifiers {
         public
         onlyOwnerOrGov
         notZeroAddress(_token)
-        sameArrayLength(_amounts.length, _minDelays.length)
-        sameArrayLength(_cliffTimes.length, _minDelays.length)
+        equalValue(_amounts.length, _minDelays.length)
+        equalValue(_cliffTimes.length, _minDelays.length)
         orderedArray(_amounts)
         orderedArray(_minDelays)
         orderedArray(_cliffTimes)

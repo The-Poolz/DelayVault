@@ -40,7 +40,7 @@ contract DelayModifiers is DelayData {
         _;
     }
 
-    modifier sameArrayLength(uint256 _fLength, uint256 _sLength) {
+    modifier equalValue(uint256 _fLength, uint256 _sLength) {
         require(_fLength == _sLength, "invalid array length");
         _;
     }
