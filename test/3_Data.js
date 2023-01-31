@@ -69,7 +69,6 @@ contract("Delay vault data", (accounts) => {
         assert.equal(twoDaysCliffTime.toString(), twoDays.toString())
         const maxCliffTime = await instance.GetCliffTime(tokens[0].address, amounts[2])
         assert.equal(maxCliffTime.toString(), week.toString())
-        const noAmountlimit = 249
         const zeroCliffTime = await instance.GetCliffTime(tokens[0].address, amounts[0] - 1)
         assert.equal(zeroCliffTime.toString(), 0)
     })
