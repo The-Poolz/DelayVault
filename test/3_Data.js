@@ -35,42 +35,42 @@ contract("Delay vault data", (accounts) => {
     })
 
     it("get min delay", async () => {
-        // amounts limits
-        // _________________________________
-        // 0 - 249          | no limit      |
-        // 250 - 999        | first limit   |
-        // 1000 - 19999     | second limit  |
-        // 20000 - infinity | third limit   |
-        //```````````````````````````````````
+        // amounts            start times
+        // ___________________________________________________
+        // 0 - 249          |0 - day-1        | no limit      |
+        // 250 - 999        |day - twoDays-1  | first limit   |
+        // 1000 - 19999     |twoDays - week-1 | second limit  |
+        // 20000 - infinity |week - inifinity | third limit   |
+        //````````````````````````````````````````````````````
         const lockPeriods = [day, week, twoWeeks]
         await instance.setMinDelays(tokens[0].address, amounts, lockPeriods, cliffTimes)
-        const dayDelay = await instance.GetMinDelay(tokens[0].address, 250)
+        const dayDelay = await instance.GetMinDelay(tokens[0].address, amounts[0])
         assert.equal(dayDelay.toString(), day.toString())
-        const zeroDelay = await instance.GetMinDelay(tokens[0].address, 249)
+        const zeroDelay = await instance.GetMinDelay(tokens[0].address, amounts[0] - 1)
         assert.equal(zeroDelay.toString(), 0)
-        const weekDelay = await instance.GetMinDelay(tokens[0].address, 1100)
+        const weekDelay = await instance.GetMinDelay(tokens[0].address, amounts[1])
         assert.equal(weekDelay.toString(), week.toString())
-        const maxDelay = await instance.GetMinDelay(tokens[0].address, 20000)
+        const maxDelay = await instance.GetMinDelay(tokens[0].address, amounts[2])
         assert.equal(maxDelay.toString(), twoWeeks.toString())
     })
 
     it("get cliff time", async () => {
-        // min delays limits
-        // _________________________________
-        // 0 - day-1        | no limit      |
-        // day - twoDays-1  | first limit   |
-        // twoDays - week-1 | second limit  |
-        // week - inifinity | third limit   |
-        //```````````````````````````````````
+        // amounts            finish times
+        // ___________________________________________________
+        // 0 - 249          |0 - day-1        | no limit      |
+        // 250 - 999        |day - twoDays-1  | first limit   |
+        // 1000 - 19999     |twoDays - week-1 | second limit  |
+        // 20000 - infinity |week - inifinity | third limit   |
+        //````````````````````````````````````````````````````
         await instance.setMinDelays(tokens[0].address, amounts, lockPeriods, cliffTimes)
-        const dayCliffTime = await instance.GetCliffTime(tokens[0].address, day)
+        const dayCliffTime = await instance.GetCliffTime(tokens[0].address, amounts[0])
         assert.equal(dayCliffTime.toString(), day.toString())
-        const twoDaysCliffTime = await instance.GetCliffTime(tokens[0].address, twoDays + day)
+        const twoDaysCliffTime = await instance.GetCliffTime(tokens[0].address, amounts[1])
         assert.equal(twoDaysCliffTime.toString(), twoDays.toString())
-        const maxCliffTime = await instance.GetCliffTime(tokens[0].address, week * 2)
+        const maxCliffTime = await instance.GetCliffTime(tokens[0].address, amounts[2])
         assert.equal(maxCliffTime.toString(), week.toString())
-        const halfDay = day / 2
-        const zeroCliffTime = await instance.GetCliffTime(tokens[0].address, halfDay)
+        const noAmountlimit = 249
+        const zeroCliffTime = await instance.GetCliffTime(tokens[0].address, amounts[0] - 1)
         assert.equal(zeroCliffTime.toString(), 0)
     })
 
