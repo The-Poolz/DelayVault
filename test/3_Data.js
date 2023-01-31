@@ -79,7 +79,7 @@ contract("Delay vault data", (accounts) => {
         const lockPeriods = [day, week, twoWeeks]
         await truffleAssert.reverts(
             instance.setMinDelays(tokens[0].address, amounts, lockPeriods, cliffTimes),
-            "amounts should be ordered"
+            "array should be ordered"
         )
     })
 
@@ -87,7 +87,15 @@ contract("Delay vault data", (accounts) => {
         const lockPeriods = [day, week, twoDays]
         await truffleAssert.reverts(
             instance.setMinDelays(tokens[0].address, amounts, lockPeriods, cliffTimes),
-            "delays should be sorted"
+            "array should be ordered"
+        )
+    })
+
+    it("should revert when not ordered cliff times", async () => {
+        const cliffTimes = [day, week, twoDays]
+        await truffleAssert.reverts(
+            instance.setMinDelays(tokens[0].address, amounts, lockPeriods, cliffTimes),
+            "array should be ordered"
         )
     })
 
