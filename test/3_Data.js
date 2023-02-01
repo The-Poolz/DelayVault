@@ -13,8 +13,8 @@ contract("Delay vault data", (accounts) => {
     const twoDays = day * 2
     const week = day * 7
     const twoWeeks = day * 14
-    const cliffTimes = [day, twoDays, week]
-    const lockPeriods = [day, twoDays, week]
+    const startDelays = [day, twoDays, week]
+    const finishDelays = [day, twoDays, week]
     const amounts = [250, 1000, 20000]
 
     before(async () => {
@@ -28,84 +28,70 @@ contract("Delay vault data", (accounts) => {
 
     it("should get delay limit", async () => {
         const amounts = [10, 20, 30]
-        await instance.setMinDelays(tokens[0].address, amounts, lockPeriods, cliffTimes)
+        await instance.setMinDelays(tokens[0].address, amounts, startDelays, finishDelays)
         const result = await instance.GetDelayLimits(tokens[0].address)
         assert.equal(result[0].toString(), amounts.toString())
-        assert.equal(result[1].toString(), lockPeriods.toString())
+        assert.equal(result[1].toString(), startDelays.toString())
+        assert.equal(result[2].toString(), finishDelays.toString())
     })
 
-    it("get min delay", async () => {
-        // amounts limits
-        // _________________________________
-        // 0 - 249          | no limit      |
-        // 250 - 999        | first limit   |
-        // 1000 - 19999     | second limit  |
-        // 20000 - infinity | third limit   |
-        //```````````````````````````````````
-        const lockPeriods = [day, week, twoWeeks]
-        await instance.setMinDelays(tokens[0].address, amounts, lockPeriods, cliffTimes)
-        const dayDelay = await instance.GetMinDelay(tokens[0].address, 250)
-        assert.equal(dayDelay.toString(), day.toString())
-        const zeroDelay = await instance.GetMinDelay(tokens[0].address, 249)
-        assert.equal(zeroDelay.toString(), 0)
-        const weekDelay = await instance.GetMinDelay(tokens[0].address, 1100)
-        assert.equal(weekDelay.toString(), week.toString())
-        const maxDelay = await instance.GetMinDelay(tokens[0].address, 20000)
-        assert.equal(maxDelay.toString(), twoWeeks.toString())
-    })
-
-    it("get cliff time", async () => {
-        // min delays limits
-        // _________________________________
-        // 0 - day-1        | no limit      |
-        // day - twoDays-1  | first limit   |
-        // twoDays - week-1 | second limit  |
-        // week - inifinity | third limit   |
-        //```````````````````````````````````
-        await instance.setMinDelays(tokens[0].address, amounts, lockPeriods, cliffTimes)
-        const dayCliffTime = await instance.GetCliffTime(tokens[0].address, day)
-        assert.equal(dayCliffTime.toString(), day.toString())
-        const twoDaysCliffTime = await instance.GetCliffTime(tokens[0].address, twoDays + day)
-        assert.equal(twoDaysCliffTime.toString(), twoDays.toString())
-        const maxCliffTime = await instance.GetCliffTime(tokens[0].address, week * 2)
-        assert.equal(maxCliffTime.toString(), week.toString())
-        const halfDay = day / 2
-        const zeroCliffTime = await instance.GetCliffTime(tokens[0].address, halfDay)
-        assert.equal(zeroCliffTime.toString(), 0)
+    it("get limit delays", async () => {
+        // amounts            start delays         finish Delays
+        // _______________________________________________________________________________
+        // 0 - 249          |0 - day-1           | 0 - twoDays-1          | no limit      |
+        // 250 - 999        |day - week-1        | twoDays - twoWeeks-1   | first limit   |
+        // 1000 - 19999     |week - twoWeeks-1   | twoWeeks - month-1     | second limit  |
+        // 20000 - infinity |twoWeeks - inifinity| month - inifinity      | third limit   |
+        //`````````````````````````````````````````````````````````````````````````````````
+        const startDelays = [day, week, twoWeeks]
+        const month = twoWeeks * 4
+        const finishDelays = [twoDays, twoWeeks, month]
+        await instance.setMinDelays(tokens[0].address, amounts, startDelays, finishDelays)
+        let delays = await instance.GetMinDelays(tokens[0].address, 250)
+        assert.equal(delays._startDelay.toString(), day.toString())
+        assert.equal(delays._finishDelay.toString(), twoDays.toString())
+        delays = await instance.GetMinDelays(tokens[0].address, 249)
+        assert.equal(delays._startDelay.toString(), 0)
+        assert.equal(delays._finishDelay.toString(), 0)
+        delays = await instance.GetMinDelays(tokens[0].address, 1100)
+        assert.equal(delays._startDelay.toString(), week.toString())
+        assert.equal(delays._finishDelay.toString(), twoWeeks.toString())
+        delays = await instance.GetMinDelays(tokens[0].address, 20000)
+        assert.equal(delays._startDelay.toString(), twoWeeks.toString())
+        assert.equal(delays._finishDelay.toString(), month.toString())
     })
 
     it("should revert when not ordered amount", async () => {
         const amounts = [1000, 500, 10000]
-        const lockPeriods = [day, week, twoWeeks]
         await truffleAssert.reverts(
-            instance.setMinDelays(tokens[0].address, amounts, lockPeriods, cliffTimes),
+            instance.setMinDelays(tokens[0].address, amounts, startDelays, finishDelays),
             "array should be ordered"
         )
     })
 
-    it("should revert when not ordered delays", async () => {
-        const lockPeriods = [day, week, twoDays]
+    it("should revert when not ordered start delays", async () => {
+        const startDelays = [day, week, twoDays]
         await truffleAssert.reverts(
-            instance.setMinDelays(tokens[0].address, amounts, lockPeriods, cliffTimes),
+            instance.setMinDelays(tokens[0].address, amounts, startDelays, finishDelays),
             "array should be ordered"
         )
     })
 
-    it("should revert when not ordered cliff times", async () => {
-        const cliffTimes = [day, week, twoDays]
+    it("should revert when not ordered finish delays", async () => {
+        const finishDelays = [day, week, twoDays]
         await truffleAssert.reverts(
-            instance.setMinDelays(tokens[0].address, amounts, lockPeriods, cliffTimes),
+            instance.setMinDelays(tokens[0].address, amounts, startDelays, finishDelays),
             "array should be ordered"
         )
     })
 
     it("should get my token addresses", async () => {
         const amounts = [amount, amount * 2, amount * 3]
-        const lockPeriods = [week, week * 2, week * 3]
+        const finishDelays = [week, week * 2, week * 3]
         for (let i = 0; i < tokens.length; i++) {
-            await instance.setMinDelays(tokens[i].address, amounts, lockPeriods, cliffTimes)
+            await instance.setMinDelays(tokens[i].address, amounts, startDelays, finishDelays)
             await tokens[i].approve(instance.address, amount)
-            await instance.CreateVault(tokens[i].address, amount, week)
+            await instance.CreateVault(tokens[i].address, amount, week, week)
         }
         const allMyTokens = await instance.GetAllMyTokens(accounts[0])
         const myTokens = await instance.GetMyTokens(accounts[0])
@@ -116,12 +102,12 @@ contract("Delay vault data", (accounts) => {
     it("should return all data", async () => {
         //create token
         token = await TestToken.new("Poolz", "$POOLZ")
-        await instance.setMinDelays(token.address, amounts, lockPeriods, cliffTimes)
-        //create vaults
+        await instance.setMinDelays(token.address, amounts, startDelays, finishDelays)
+        // //create vaults
         for (let i = 0; i < accounts.length; i++) {
             await token.transfer(accounts[i], amount)
             await token.approve(instance.address, amount, { from: accounts[i] })
-            await instance.CreateVault(token.address, amount, week, { from: accounts[i] })
+            await instance.CreateVault(token.address, amount, week, week, { from: accounts[i] })
         }
         const data = await instance.GetAllUsersData(token.address)
         assert.equal(data[0].length, data[1].length)
