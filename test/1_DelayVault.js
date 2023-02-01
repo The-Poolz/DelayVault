@@ -2,7 +2,7 @@ const DelayVault = artifacts.require("DelayVault")
 const TestToken = artifacts.require("ERC20Token")
 
 const constants = require("@openzeppelin/test-helpers/src/constants")
-const { assert, AssertionError } = require("chai")
+const { assert } = require("chai")
 const truffleAssert = require("truffle-assertions")
 
 contract("DelayVault", (accounts) => {
