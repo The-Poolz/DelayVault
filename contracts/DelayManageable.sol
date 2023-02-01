@@ -20,20 +20,20 @@ contract DelayManageable is Pausable, GovManager, DelayEvents, DelayModifiers {
     function setMinDelays(
         address _token,
         uint256[] memory _amounts,
-        uint256[] memory _minDelays,
-        uint256[] memory _cliffTimes
+        uint256[] memory _startDelays,
+        uint256[] memory _finishDelays
     )
-        public
+        external
         onlyOwnerOrGov
         notZeroAddress(_token)
-        equalValue(_amounts.length, _minDelays.length)
-        equalValue(_cliffTimes.length, _minDelays.length)
+        equalValue(_amounts.length, _startDelays.length)
+        equalValue(_finishDelays.length, _startDelays.length)
         orderedArray(_amounts)
-        orderedArray(_minDelays)
-        orderedArray(_cliffTimes)
+        orderedArray(_startDelays)
+        orderedArray(_finishDelays)
     {
-        DelayLimit[_token] = Delay(_amounts, _minDelays, _cliffTimes, true);
-        emit UpdatedMinDelays(_token, _amounts, _minDelays, _cliffTimes);
+        DelayLimit[_token] = Delay(_amounts, _startDelays, _finishDelays, true);
+        emit UpdatedMinDelays(_token, _amounts, _startDelays, _finishDelays);
     }
 
     function swapTokenStatusFilter(address _token)
