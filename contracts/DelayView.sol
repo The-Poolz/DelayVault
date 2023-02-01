@@ -40,51 +40,39 @@ contract DelayView is DelayManageable {
     function GetDelayLimits(address _token)
         public
         view
-        returns (uint256[] memory _amount, uint256[] memory _minDelays)
+        returns (
+            uint256[] memory _amount,
+            uint256[] memory _startDelays,
+            uint256[] memory _finishDelays
+        )
     {
-        return (DelayLimit[_token].Amounts, DelayLimit[_token].MinDelays);
+        (_amount, _startDelays, _finishDelays) = (
+            DelayLimit[_token].Amounts,
+            DelayLimit[_token].StartDelays,
+            DelayLimit[_token].FinishDelays
+        );
     }
 
-    function GetMinDelay(address _token, uint256 _amount)
+    function GetMinDelays(address _token, uint256 _amount)
         public
         view
-        returns (uint256 _delay)
+        returns (uint256 _startDelay, uint256 _finishDelay)
     {
         if (
             DelayLimit[_token].Amounts.length == 0 ||
             DelayLimit[_token].Amounts[0] > _amount
-        ) return 0;
+        ) return (0, 0);
         uint256 tempAmount = 0;
-        _delay = DelayLimit[_token].MinDelays[0];
+        _startDelay = DelayLimit[_token].StartDelays[0];
+        _finishDelay = DelayLimit[_token].FinishDelays[0];
         for (uint256 i = 0; i < DelayLimit[_token].Amounts.length; i++) {
             if (
                 _amount >= DelayLimit[_token].Amounts[i] &&
                 tempAmount < DelayLimit[_token].Amounts[i]
             ) {
-                _delay = DelayLimit[_token].MinDelays[i];
+                _startDelay = DelayLimit[_token].StartDelays[i];
+                _finishDelay = DelayLimit[_token].FinishDelays[i];
                 tempAmount = DelayLimit[_token].Amounts[i];
-            }
-        }
-    }
-
-    function GetCliffTime(address _token, uint256 _delay)
-        public
-        view
-        returns (uint256 _cliffTime)
-    {
-        if (
-            DelayLimit[_token].MinDelays.length == 0 ||
-            DelayLimit[_token].MinDelays[0] > _delay
-        ) return 0;
-        uint256 tempDelay = 0;
-        _cliffTime = DelayLimit[_token].CliffTimes[0];
-        for (uint256 i = 0; i < DelayLimit[_token].Amounts.length; i++) {
-            if (
-                _delay >= DelayLimit[_token].MinDelays[i] &&
-                tempDelay < DelayLimit[_token].MinDelays[i]
-            ) {
-                _cliffTime = DelayLimit[_token].CliffTimes[i];
-                tempDelay = DelayLimit[_token].MinDelays[i];
             }
         }
     }

@@ -12,54 +12,72 @@ contract DelayVault is DelayView, ERC20Helper {
     function CreateVault(
         address _token,
         uint256 _amount,
-        uint256 _lockTime
+        uint256 _startDelay,
+        uint256 _finishDelay
     )
         public
         whenNotPaused
         notZeroAddress(_token)
         isTokenActive(_token)
-        shortLockPeriod(_token, _lockTime)
+        shortStartDelay(_token, _startDelay)
+        shortFinishDelay(_token, _finishDelay)
     {
         Vault storage vault = VaultMap[_token][msg.sender];
         require(
-            _amount > 0 || _lockTime > vault.LockPeriod,
+            _amount > 0 ||
+                _startDelay > vault.StartDelay ||
+                _finishDelay > vault.FinishDelay,
             "amount should be greater than zero"
         );
+        (uint256 _startMinDelay, uint256 _finishMinDelay) = GetMinDelays(
+            _token,
+            _amount
+        );
         require(
-            _lockTime >= GetMinDelay(_token, _amount),
-            "minimum delay greater than lock time"
+            _startDelay >= _startMinDelay,
+            "start delay greater than min start delay"
+        );
+        require(
+            _finishDelay >= _finishMinDelay,
+            "finish delay greater than min finish delay"
         );
         TransferInToken(_token, msg.sender, _amount);
         vault.Amount += _amount;
-        vault.LockPeriod = _lockTime;
+        vault.StartDelay = _startDelay;
+        vault.FinishDelay = _finishDelay;
         if (!Array.isInArray(Users[_token], msg.sender)) {
             Users[_token].push(msg.sender);
         }
         MyTokens[msg.sender].push(_token);
         VaultMap[msg.sender][_token] = vault; // populate mapping in the reverse direction
-        emit VaultValueChanged(_token, msg.sender, vault.Amount, _lockTime);
+        emit VaultValueChanged(
+            _token,
+            msg.sender,
+            vault.Amount,
+            _startDelay,
+            _finishDelay
+        );
     }
 
     function Withdraw(address _token) public isVaultNotEmpty(_token) {
         Vault storage vault = VaultMap[_token][msg.sender];
-        uint256 finishTime = block.timestamp + vault.LockPeriod;
-        uint256 cliffTime = GetCliffTime(_token, vault.LockPeriod);
+        uint256 startDelay = block.timestamp + vault.StartDelay;
+        uint256 finishDelay = startDelay + vault.FinishDelay;
         uint256 lockAmount = vault.Amount;
-        vault.Amount = 0;
-        vault.LockPeriod = 0;
+        vault.Amount = vault.FinishDelay = vault.StartDelay = 0;
         if (LockedDealAddress != address(0)) {
             ApproveAllowanceERC20(_token, LockedDealAddress, lockAmount);
             ILockedDealV2(LockedDealAddress).CreateNewPool(
                 _token,
-                block.timestamp,
-                cliffTime,
-                finishTime,
+                startDelay,
+                0,
+                finishDelay,
                 lockAmount,
                 msg.sender
             );
         } else {
             TransferToken(_token, msg.sender, lockAmount);
         }
-        emit VaultValueChanged(_token, msg.sender, 0, 0);
+        emit VaultValueChanged(_token, msg.sender, 0, 0, 0);
     }
 }

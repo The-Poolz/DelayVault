@@ -11,13 +11,14 @@ contract DelayData {
 
     struct Vault {
         uint256 Amount;
-        uint256 LockPeriod;
+        uint256 StartDelay;
+        uint256 FinishDelay;
     }
 
     struct Delay {
         uint256[] Amounts;
-        uint256[] MinDelays;
-        uint256[] CliffTimes;
+        uint256[] StartDelays;
+        uint256[] FinishDelays;
         bool isActive;
     }
 }

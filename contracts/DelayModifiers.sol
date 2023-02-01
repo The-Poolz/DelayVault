@@ -32,10 +32,18 @@ contract DelayModifiers is DelayData {
         _;
     }
 
-    modifier shortLockPeriod(address _token, uint256 _lockPeriod) {
+    modifier shortStartDelay(address _token, uint256 _startDelay) {
         require(
-            _lockPeriod >= VaultMap[_token][msg.sender].LockPeriod,
-            "can't set a shorter blocking period than the last one"
+            _startDelay >= VaultMap[_token][msg.sender].StartDelay,
+            "can't set a shorter start period than the last one"
+        );
+        _;
+    }
+
+    modifier shortFinishDelay(address _token, uint256 _finishDelay) {
+        require(
+            _finishDelay >= VaultMap[_token][msg.sender].FinishDelay,
+            "can't set a shorter finish period than the last one"
         );
         _;
     }

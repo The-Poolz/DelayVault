@@ -8,46 +8,61 @@ const truffleAssert = require("truffle-assertions")
 contract("DelayVault", (accounts) => {
     let instance, token
     const amount = 1000
-    const day = 1 * 24 * 60 * 60
+    const day = 86400
     const twoDays = day * 2
     const week = day * 7
     const amounts = [10, 30, 1000]
-    const lockPeriods = [day, twoDays, week]
-    const cliffTimes = [day, twoDays, week]
+    const startDelays = [day, twoDays, week]
+    const finishDelays = [day, twoDays, week]
 
     before(async () => {
         instance = await DelayVault.new()
         token = await TestToken.new("TestToken", "TEST")
     })
 
-    it("should revert invalid blocking period", async () => {
-        await instance.setMinDelays(token.address, amounts, lockPeriods, cliffTimes)
+    it("should revert invalid start delay", async () => {
+        await instance.setMinDelays(token.address, amounts, startDelays, finishDelays)
         await token.approve(instance.address, amount)
         await truffleAssert.reverts(
-            instance.CreateVault(token.address, amount, day),
-            "minimum delay greater than lock time"
+            instance.CreateVault(token.address, amount, day, week),
+            "start delay greater than min start delay"
+        )
+    })
+
+    it("should revert invalid finish delay", async () => {
+        await instance.setMinDelays(token.address, amounts, startDelays, finishDelays)
+        await token.approve(instance.address, amount)
+        await truffleAssert.reverts(
+            instance.CreateVault(token.address, amount, week, day),
+            "finish delay greater than min finish delay"
         )
     })
 
     it("should create vault", async () => {
         await token.approve(instance.address, amount)
-        const tx = await instance.CreateVault(token.address, amount, week)
+        const tx = await instance.CreateVault(token.address, amount, week, week * 2)
         const tokenAddr = tx.logs[tx.logs.length - 1].args.Token
         const quantity = tx.logs[tx.logs.length - 1].args.Amount
-        const lockTime = tx.logs[tx.logs.length - 1].args.LockTime
+        const startDelay = tx.logs[tx.logs.length - 1].args.StartDelay
+        const finishDelay = tx.logs[tx.logs.length - 1].args.FinishDelay
         const owner = tx.logs[tx.logs.length - 1].args.Owner
         assert.equal(tokenAddr.toString(), token.address)
         assert.equal(quantity.toString(), amount.toString())
-        assert.equal(lockTime.toString(), week.toString())
+        assert.equal(startDelay.toString(), week.toString())
+        assert.equal(finishDelay.toString(), (week * 2).toString())
         assert.equal(owner.toString(), accounts[0].toString())
     })
 
     it("should revert shorter blocking period than the last one", async () => {
-        await instance.setMinDelays(token.address, amounts, lockPeriods, cliffTimes)
+        await instance.setMinDelays(token.address, amounts, startDelays, finishDelays)
         await token.approve(instance.address, amount)
         await truffleAssert.reverts(
-            instance.CreateVault(token.address, amount, day),
-            "can't set a shorter blocking period than the last one"
+            instance.CreateVault(token.address, amount, day, week * 2),
+            "can't set a shorter start period than the last one"
+        )
+        await truffleAssert.reverts(
+            instance.CreateVault(token.address, amount, week, twoDays),
+            "can't set a shorter finish period than the last one"
         )
     })
 
@@ -60,8 +75,11 @@ contract("DelayVault", (accounts) => {
     it("should revert zero amount", async () => {
         token = await TestToken.new("TestToken", "TEST")
         await token.approve(instance.address, amount)
-        await instance.setMinDelays(token.address, amounts, lockPeriods, cliffTimes)
-        await truffleAssert.reverts(instance.CreateVault(token.address, "0", "0"), "amount should be greater than zero")
+        await instance.setMinDelays(token.address, amounts, startDelays, finishDelays)
+        await truffleAssert.reverts(
+            instance.CreateVault(token.address, "0", "0", "0"),
+            "amount should be greater than zero"
+        )
     })
 
     it("withdraw tokens when no locked deal", async () => {
@@ -71,7 +89,7 @@ contract("DelayVault", (accounts) => {
         await token.transfer(owner, amount)
         await token.approve(instance.address, amount, { from: owner })
         await instance.swapTokenStatusFilter(token.address)
-        await instance.CreateVault(token.address, amount, week, { from: owner })
+        await instance.CreateVault(token.address, amount, week, week, { from: owner })
         const oldOwnerBalance = await token.balanceOf(owner)
         assert.equal(oldOwnerBalance.toString(), 0)
         await instance.Withdraw(token.address, { from: owner })
