@@ -48,15 +48,15 @@ contract DelayVault is DelayView, ERC20Helper {
         vault.Amount = 0;
         vault.LockPeriod = 0;
         if (LockedDealAddress != address(0)) {
-            // ApproveAllowanceERC20(_token, LockedDealAddress, lockAmount);
-            // ILockedDealV2(LockedDealAddress).CreateNewPool(
-            //     _token,
-            //     block.timestamp,
-            //     cliffTime,
-            //     finishTime,
-            //     lockAmount,
-            //     msg.sender
-            // );
+            ApproveAllowanceERC20(_token, LockedDealAddress, lockAmount);
+            ILockedDealV2(LockedDealAddress).CreateNewPool(
+                _token,
+                block.timestamp,
+                cliffTime,
+                finishTime,
+                lockAmount,
+                msg.sender
+            );
         } else {
             TransferToken(_token, msg.sender, lockAmount);
         }
