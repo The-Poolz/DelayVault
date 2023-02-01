@@ -36,30 +36,30 @@ contract DelayVault is DelayView, ERC20Helper {
             Users[_token].push(msg.sender);
         }
         MyTokens[msg.sender].push(_token);
-        VaultMap[msg.sender][_token] = vault; // populate mapping in the reverse direction 
+        VaultMap[msg.sender][_token] = vault; // populate mapping in the reverse direction
         emit VaultValueChanged(_token, msg.sender, vault.Amount, _lockTime);
     }
 
-    function Withdraw(address _token)
-        public
-        notZeroAddress(LockedDealAddress)
-        isVaultNotEmpty(_token)
-    {
+    function Withdraw(address _token) public isVaultNotEmpty(_token) {
         Vault storage vault = VaultMap[_token][msg.sender];
         uint256 finishTime = block.timestamp + vault.LockPeriod;
         uint256 cliffTime = GetCliffTime(_token, vault.LockPeriod);
         uint256 lockAmount = vault.Amount;
         vault.Amount = 0;
         vault.LockPeriod = 0;
-        ApproveAllowanceERC20(_token, LockedDealAddress, lockAmount);
-        ILockedDealV2(LockedDealAddress).CreateNewPool(
-            _token,
-            block.timestamp,
-            cliffTime,
-            finishTime,
-            lockAmount,
-            msg.sender
-        );
+        if (LockedDealAddress != address(0)) {
+            // ApproveAllowanceERC20(_token, LockedDealAddress, lockAmount);
+            // ILockedDealV2(LockedDealAddress).CreateNewPool(
+            //     _token,
+            //     block.timestamp,
+            //     cliffTime,
+            //     finishTime,
+            //     lockAmount,
+            //     msg.sender
+            // );
+        } else {
+            TransferToken(_token, msg.sender, lockAmount);
+        }
         emit VaultValueChanged(_token, msg.sender, 0, 0);
     }
 }
