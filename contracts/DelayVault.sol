@@ -59,25 +59,28 @@ contract DelayVault is DelayView, ERC20Helper {
         );
     }
 
-    function Withdraw(address _token)
-        public
-        notZeroAddress(LockedDealAddress)
-        isVaultNotEmpty(_token)
-    {
+    /** @dev Creates a new pool of tokens for a specified period or,
+         if there is no Locked Deal address, sends tokens to the owner.
+    */
+    function Withdraw(address _token) public isVaultNotEmpty(_token) {
         Vault storage vault = VaultMap[_token][msg.sender];
         uint256 startDelay = block.timestamp + vault.StartDelay;
         uint256 finishDelay = startDelay + vault.FinishDelay;
         uint256 lockAmount = vault.Amount;
         vault.Amount = vault.FinishDelay = vault.StartDelay = 0;
-        ApproveAllowanceERC20(_token, LockedDealAddress, lockAmount);
-        ILockedDealV2(LockedDealAddress).CreateNewPool(
-            _token,
-            startDelay,
-            0,
-            finishDelay,
-            lockAmount,
-            msg.sender
-        );
+        if (LockedDealAddress != address(0)) {
+            ApproveAllowanceERC20(_token, LockedDealAddress, lockAmount);
+            ILockedDealV2(LockedDealAddress).CreateNewPool(
+                _token,
+                startDelay,
+                0,
+                finishDelay,
+                lockAmount,
+                msg.sender
+            );
+        } else {
+            TransferToken(_token, msg.sender, lockAmount);
+        }
         emit VaultValueChanged(_token, msg.sender, 0, 0, 0);
     }
 }

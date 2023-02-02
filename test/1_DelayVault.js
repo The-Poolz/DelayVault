@@ -1,6 +1,7 @@
 const DelayVault = artifacts.require("DelayVault")
 const TestToken = artifacts.require("ERC20Token")
 
+const constants = require("@openzeppelin/test-helpers/src/constants")
 const { assert } = require("chai")
 const truffleAssert = require("truffle-assertions")
 
@@ -79,5 +80,21 @@ contract("DelayVault", (accounts) => {
             instance.CreateVault(token.address, "0", "0", "0"),
             "amount should be greater than zero"
         )
+    })
+
+    it("withdraw tokens when no locked deal", async () => {
+        const owner = accounts[2]
+        const token = await TestToken.new("TestToken", "TEST")
+        await instance.setLockedDealAddress(constants.ZERO_ADDRESS)
+        await token.transfer(owner, amount)
+        await token.approve(instance.address, amount, { from: owner })
+        await instance.swapTokenStatusFilter(token.address)
+        await instance.CreateVault(token.address, amount, week, week, { from: owner })
+        const oldOwnerBalance = await token.balanceOf(owner)
+        assert.equal(oldOwnerBalance.toString(), 0)
+        await instance.Withdraw(token.address, { from: owner })
+        const ownerBalance = await token.balanceOf(owner)
+        assert.notEqual(ownerBalance, oldOwnerBalance)
+        assert.equal(ownerBalance.toString(), amount.toString())
     })
 })
