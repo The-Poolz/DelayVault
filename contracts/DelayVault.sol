@@ -59,6 +59,9 @@ contract DelayVault is DelayView, ERC20Helper {
         );
     }
 
+    /** @dev Creates a new pool of tokens for a specified period or,
+         if there is no Locked Deal address, sends tokens to the owner.
+    */
     function Withdraw(address _token) public isVaultNotEmpty(_token) {
         Vault storage vault = VaultMap[_token][msg.sender];
         uint256 startDelay = block.timestamp + vault.StartDelay;
