@@ -8,12 +8,14 @@ contract DelayEvents {
         address indexed Owner,
         uint256 Amount,
         uint256 StartDelay,
+        uint256 CliffDelays,
         uint256 FinishDelay
     );
     event UpdatedMinDelays(
         address indexed Token,
         uint256[] Amounts,
         uint256[] StartDelays,
+        uint256[] CliffDelays,
         uint256[] FinishDelays
     );
 }

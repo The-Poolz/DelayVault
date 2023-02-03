@@ -14,6 +14,7 @@ contract("Delay vault data", (accounts) => {
     const week = day * 7
     const twoWeeks = day * 14
     const startDelays = [day, twoDays, week]
+    const cliffDelays = [0, 0, 0]
     const finishDelays = [day, twoDays, week]
     const amounts = [250, 1000, 20000]
 
@@ -28,7 +29,7 @@ contract("Delay vault data", (accounts) => {
 
     it("should get delay limit", async () => {
         const amounts = [10, 20, 30]
-        await instance.setMinDelays(tokens[0].address, amounts, startDelays, finishDelays)
+        await instance.setMinDelays(tokens[0].address, amounts, startDelays, cliffDelays, finishDelays)
         const result = await instance.GetDelayLimits(tokens[0].address)
         assert.equal(result[0].toString(), amounts.toString())
         assert.equal(result[1].toString(), startDelays.toString())
@@ -46,7 +47,7 @@ contract("Delay vault data", (accounts) => {
         const startDelays = [day, week, twoWeeks]
         const month = twoWeeks * 4
         const finishDelays = [twoDays, twoWeeks, month]
-        await instance.setMinDelays(tokens[0].address, amounts, startDelays, finishDelays)
+        await instance.setMinDelays(tokens[0].address, amounts, startDelays, cliffDelays, finishDelays)
         let delays = await instance.GetMinDelays(tokens[0].address, 250)
         assert.equal(delays._startDelay.toString(), day.toString())
         assert.equal(delays._finishDelay.toString(), twoDays.toString())
@@ -64,7 +65,7 @@ contract("Delay vault data", (accounts) => {
     it("should revert when not ordered amount", async () => {
         const amounts = [1000, 500, 10000]
         await truffleAssert.reverts(
-            instance.setMinDelays(tokens[0].address, amounts, startDelays, finishDelays),
+            instance.setMinDelays(tokens[0].address, amounts, startDelays, cliffDelays, finishDelays),
             "array should be ordered"
         )
     })
@@ -72,7 +73,7 @@ contract("Delay vault data", (accounts) => {
     it("should revert when not ordered start delays", async () => {
         const startDelays = [day, week, twoDays]
         await truffleAssert.reverts(
-            instance.setMinDelays(tokens[0].address, amounts, startDelays, finishDelays),
+            instance.setMinDelays(tokens[0].address, amounts, startDelays, cliffDelays, finishDelays),
             "array should be ordered"
         )
     })
@@ -80,7 +81,7 @@ contract("Delay vault data", (accounts) => {
     it("should revert when not ordered finish delays", async () => {
         const finishDelays = [day, week, twoDays]
         await truffleAssert.reverts(
-            instance.setMinDelays(tokens[0].address, amounts, startDelays, finishDelays),
+            instance.setMinDelays(tokens[0].address, amounts, startDelays, cliffDelays, finishDelays),
             "array should be ordered"
         )
     })
@@ -89,9 +90,9 @@ contract("Delay vault data", (accounts) => {
         const amounts = [amount, amount * 2, amount * 3]
         const finishDelays = [week, week * 2, week * 3]
         for (let i = 0; i < tokens.length; i++) {
-            await instance.setMinDelays(tokens[i].address, amounts, startDelays, finishDelays)
+            await instance.setMinDelays(tokens[i].address, amounts, startDelays, cliffDelays, finishDelays)
             await tokens[i].approve(instance.address, amount)
-            await instance.CreateVault(tokens[i].address, amount, week, week)
+            await instance.CreateVault(tokens[i].address, amount, week, week, week)
         }
         const allMyTokens = await instance.GetAllMyTokens(accounts[0])
         const myTokens = await instance.GetMyTokens(accounts[0])
@@ -102,12 +103,12 @@ contract("Delay vault data", (accounts) => {
     it("should return all data", async () => {
         //create token
         token = await TestToken.new("Poolz", "$POOLZ")
-        await instance.setMinDelays(token.address, amounts, startDelays, finishDelays)
+        await instance.setMinDelays(token.address, amounts, startDelays, cliffDelays, finishDelays)
         // //create vaults
         for (let i = 0; i < accounts.length; i++) {
             await token.transfer(accounts[i], amount)
             await token.approve(instance.address, amount, { from: accounts[i] })
-            await instance.CreateVault(token.address, amount, week, week, { from: accounts[i] })
+            await instance.CreateVault(token.address, amount, week, week, week, { from: accounts[i] })
         }
         const data = await instance.GetAllUsersData(token.address)
         assert.equal(data[0].length, data[1].length)

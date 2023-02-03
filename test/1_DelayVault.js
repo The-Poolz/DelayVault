@@ -13,6 +13,7 @@ contract("DelayVault", (accounts) => {
     const week = day * 7
     const amounts = [10, 30, 1000]
     const startDelays = [day, twoDays, week]
+    const cliffDelays = [day, twoDays, week]
     const finishDelays = [day, twoDays, week]
 
     before(async () => {
@@ -21,26 +22,26 @@ contract("DelayVault", (accounts) => {
     })
 
     it("should revert invalid start delay", async () => {
-        await instance.setMinDelays(token.address, amounts, startDelays, finishDelays)
+        await instance.setMinDelays(token.address, amounts, startDelays, cliffDelays, finishDelays)
         await token.approve(instance.address, amount)
         await truffleAssert.reverts(
-            instance.CreateVault(token.address, amount, day, week),
-            "start delay greater than min start delay"
+            instance.CreateVault(token.address, amount, day, day, week),
+            "delay greater than min delay"
         )
     })
 
     it("should revert invalid finish delay", async () => {
-        await instance.setMinDelays(token.address, amounts, startDelays, finishDelays)
+        await instance.setMinDelays(token.address, amounts, startDelays, cliffDelays, finishDelays)
         await token.approve(instance.address, amount)
         await truffleAssert.reverts(
-            instance.CreateVault(token.address, amount, week, day),
-            "finish delay greater than min finish delay"
+            instance.CreateVault(token.address, amount, week, week, day),
+            "delay greater than min delay"
         )
     })
 
     it("should create vault", async () => {
         await token.approve(instance.address, amount)
-        const tx = await instance.CreateVault(token.address, amount, week, week * 2)
+        const tx = await instance.CreateVault(token.address, amount, week, week, week * 2)
         const tokenAddr = tx.logs[tx.logs.length - 1].args.Token
         const quantity = tx.logs[tx.logs.length - 1].args.Amount
         const startDelay = tx.logs[tx.logs.length - 1].args.StartDelay
@@ -54,14 +55,14 @@ contract("DelayVault", (accounts) => {
     })
 
     it("should revert shorter blocking period than the last one", async () => {
-        await instance.setMinDelays(token.address, amounts, startDelays, finishDelays)
+        await instance.setMinDelays(token.address, amounts, startDelays, cliffDelays, finishDelays)
         await token.approve(instance.address, amount)
         await truffleAssert.reverts(
-            instance.CreateVault(token.address, amount, day, week * 2),
+            instance.CreateVault(token.address, amount, day, twoDays, week * 2),
             "can't set a shorter start period than the last one"
         )
         await truffleAssert.reverts(
-            instance.CreateVault(token.address, amount, week, twoDays),
+            instance.CreateVault(token.address, amount, week, week, twoDays),
             "can't set a shorter finish period than the last one"
         )
     })
@@ -75,9 +76,9 @@ contract("DelayVault", (accounts) => {
     it("should revert zero amount", async () => {
         token = await TestToken.new("TestToken", "TEST")
         await token.approve(instance.address, amount)
-        await instance.setMinDelays(token.address, amounts, startDelays, finishDelays)
+        await instance.setMinDelays(token.address, amounts, startDelays, cliffDelays, finishDelays)
         await truffleAssert.reverts(
-            instance.CreateVault(token.address, "0", "0", "0"),
+            instance.CreateVault(token.address, "0", "0", "0", "0"),
             "amount should be greater than zero"
         )
     })
@@ -89,7 +90,7 @@ contract("DelayVault", (accounts) => {
         await token.transfer(owner, amount)
         await token.approve(instance.address, amount, { from: owner })
         await instance.swapTokenStatusFilter(token.address)
-        await instance.CreateVault(token.address, amount, week, week, { from: owner })
+        await instance.CreateVault(token.address, amount, week, week, week, { from: owner })
         const oldOwnerBalance = await token.balanceOf(owner)
         assert.equal(oldOwnerBalance.toString(), 0)
         await instance.Withdraw(token.address, { from: owner })

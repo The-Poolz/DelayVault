@@ -21,19 +21,34 @@ contract DelayManageable is Pausable, GovManager, DelayEvents, DelayModifiers {
         address _token,
         uint256[] memory _amounts,
         uint256[] memory _startDelays,
+        uint256[] memory _cliffDelays,
         uint256[] memory _finishDelays
-    )
-        external
-        onlyOwnerOrGov
-        notZeroAddress(_token)
-        equalValue(_amounts.length, _startDelays.length)
-        equalValue(_finishDelays.length, _startDelays.length)
-        orderedArray(_amounts)
-        orderedArray(_startDelays)
-        orderedArray(_finishDelays)
-    {
-        DelayLimit[_token] = Delay(_amounts, _startDelays, _finishDelays, true);
-        emit UpdatedMinDelays(_token, _amounts, _startDelays, _finishDelays);
+    ) external onlyOwnerOrGov {
+        {
+            // Stack Too deep error fixing
+            _notZeroAddress(_token);
+            _equalValue(_amounts.length, _startDelays.length);
+            _equalValue(_finishDelays.length, _startDelays.length);
+            _equalValue(_cliffDelays.length, _startDelays.length);
+            _orderedArray(_amounts);
+            _orderedArray(_startDelays);
+            _orderedArray(_cliffDelays);
+            _orderedArray(_finishDelays);
+        }
+        DelayLimit[_token] = Delay(
+            _amounts,
+            _startDelays,
+            _cliffDelays,
+            _finishDelays,
+            true
+        );
+        emit UpdatedMinDelays(
+            _token,
+            _amounts,
+            _startDelays,
+            _cliffDelays,
+            _finishDelays
+        );
     }
 
     function swapTokenStatusFilter(address _token)
