@@ -67,6 +67,11 @@ contract("Delay vault admin settings", (accounts) => {
             instance.setMinDelays(token.address, invalidAmounts, startDelays, cliffDelays, finishDelays),
             "invalid array length"
         )
+        const invalidCliffDelays = [day, week]
+        await truffleAssert.reverts(
+            instance.setMinDelays(token.address, amounts, startDelays, invalidCliffDelays, finishDelays),
+            "invalid array length"
+        )
     })
 
     it("should revert with the same value", async () => {

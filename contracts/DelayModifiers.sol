@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 import "./DelayData.sol";
 import "poolz-helper-v2/contracts/Array.sol";
 
-/// @title contains modifiers and stores variables.
+/// @title contains modifiers.
 contract DelayModifiers is DelayData {
     modifier uniqueAddress(address _addr, address _oldAddr) {
         require(_addr != _oldAddr, "can't set the same address");

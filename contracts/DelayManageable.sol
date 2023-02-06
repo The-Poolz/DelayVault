@@ -23,17 +23,16 @@ contract DelayManageable is Pausable, GovManager, DelayEvents, DelayModifiers {
         uint256[] memory _startDelays,
         uint256[] memory _cliffDelays,
         uint256[] memory _finishDelays
-    ) external onlyOwnerOrGov {
+    ) external onlyOwnerOrGov notZeroAddress(_token) {
         {
             // Stack Too deep error fixing
-            _notZeroAddress(_token);
-            _equalValue(_amounts.length, _startDelays.length);
-            _equalValue(_finishDelays.length, _startDelays.length);
-            _equalValue(_cliffDelays.length, _startDelays.length);
-            _orderedArray(_amounts);
-            _orderedArray(_startDelays);
-            _orderedArray(_cliffDelays);
-            _orderedArray(_finishDelays);
+            _equalValues(
+                _amounts.length,
+                _startDelays.length,
+                _cliffDelays.length,
+                _finishDelays.length
+            );
+            _orderedArrays(_amounts, _startDelays, _cliffDelays, _finishDelays);
         }
         DelayLimit[_token] = Delay(
             _amounts,
@@ -65,5 +64,28 @@ contract DelayManageable is Pausable, GovManager, DelayEvents, DelayModifiers {
 
     function Unpause() public onlyOwnerOrGov {
         _unpause();
+    }
+
+    function _orderedArrays(
+        uint256[] memory _amounts,
+        uint256[] memory _startDelays,
+        uint256[] memory _cliffDelays,
+        uint256[] memory _finishDelays
+    ) internal pure {
+        _orderedArray(_amounts);
+        _orderedArray(_startDelays);
+        _orderedArray(_cliffDelays);
+        _orderedArray(_finishDelays);
+    }
+
+    function _equalValues(
+        uint256 _amountsL,
+        uint256 _startDelaysL,
+        uint256 _finishDelaysL,
+        uint256 _cliffDelaysL
+    ) internal pure {
+        _equalValue(_amountsL, _startDelaysL);
+        _equalValue(_finishDelaysL, _startDelaysL);
+        _equalValue(_cliffDelaysL, _startDelaysL);
     }
 }

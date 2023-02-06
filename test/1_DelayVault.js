@@ -39,6 +39,15 @@ contract("DelayVault", (accounts) => {
         )
     })
 
+    it("should revert invalid cliff delay", async () => {
+        await instance.setMinDelays(token.address, amounts, startDelays, cliffDelays, finishDelays)
+        await token.approve(instance.address, amount)
+        await truffleAssert.reverts(
+            instance.CreateVault(token.address, amount, week, day, week),
+            "delay greater than min delay"
+        )
+    })
+
     it("should create vault", async () => {
         await token.approve(instance.address, amount)
         const tx = await instance.CreateVault(token.address, amount, week, week, week * 2)
