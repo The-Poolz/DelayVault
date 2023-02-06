@@ -19,10 +19,10 @@ contract DelayManageable is Pausable, GovManager, DelayEvents, DelayModifiers {
 
     function setMinDelays(
         address _token,
-        uint256[] memory _amounts,
-        uint256[] memory _startDelays,
-        uint256[] memory _cliffDelays,
-        uint256[] memory _finishDelays
+        uint256[] calldata _amounts,
+        uint256[] calldata _startDelays,
+        uint256[] calldata _cliffDelays,
+        uint256[] calldata _finishDelays
     ) external onlyOwnerOrGov notZeroAddress(_token) {
         {
             // Stack Too deep error fixing
@@ -67,10 +67,10 @@ contract DelayManageable is Pausable, GovManager, DelayEvents, DelayModifiers {
     }
 
     function _orderedArrays(
-        uint256[] memory _amounts,
-        uint256[] memory _startDelays,
-        uint256[] memory _cliffDelays,
-        uint256[] memory _finishDelays
+        uint256[] calldata _amounts,
+        uint256[] calldata _startDelays,
+        uint256[] calldata _cliffDelays,
+        uint256[] calldata _finishDelays
     ) internal pure {
         _orderedArray(_amounts);
         _orderedArray(_startDelays);
