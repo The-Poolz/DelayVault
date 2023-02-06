@@ -56,23 +56,25 @@ contract DelayView is DelayManageable {
     function GetMinDelays(address _token, uint256 _amount)
         public
         view
-        returns (uint256 _startDelay, uint256 _finishDelay)
+        returns (
+            uint256 _startDelay,
+            uint256 _cliffDelay,
+            uint256 _finishDelay
+        )
     {
-        if (
-            DelayLimit[_token].Amounts.length == 0 ||
-            DelayLimit[_token].Amounts[0] > _amount
-        ) return (0, 0);
-        uint256 tempAmount = 0;
-        _startDelay = DelayLimit[_token].StartDelays[0];
-        _finishDelay = DelayLimit[_token].FinishDelays[0];
-        for (uint256 i = 0; i < DelayLimit[_token].Amounts.length; i++) {
-            if (
-                _amount >= DelayLimit[_token].Amounts[i] &&
-                tempAmount < DelayLimit[_token].Amounts[i]
-            ) {
-                _startDelay = DelayLimit[_token].StartDelays[i];
-                _finishDelay = DelayLimit[_token].FinishDelays[i];
-                tempAmount = DelayLimit[_token].Amounts[i];
+        Delay memory delayLimit = DelayLimit[_token];
+        if (delayLimit.Amounts.length == 0 || delayLimit.Amounts[0] > _amount)
+            return (0, 0, 0);
+        _startDelay = delayLimit.StartDelays[0];
+        _cliffDelay = delayLimit.CliffDelays[0];
+        _finishDelay = delayLimit.FinishDelays[0];
+        for (uint256 i = 0; i < delayLimit.Amounts.length; i++) {
+            if (_amount >= delayLimit.Amounts[i]) {
+                _startDelay = delayLimit.StartDelays[i];
+                _cliffDelay = delayLimit.CliffDelays[i];
+                _finishDelay = delayLimit.FinishDelays[i];
+            } else {
+                break;
             }
         }
     }

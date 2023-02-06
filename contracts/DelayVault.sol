@@ -13,48 +13,50 @@ contract DelayVault is DelayView, ERC20Helper {
         address _token,
         uint256 _amount,
         uint256 _startDelay,
+        uint256 _cliffDelay,
         uint256 _finishDelay
-    )
-        public
-        whenNotPaused
-        notZeroAddress(_token)
-        isTokenActive(_token)
-        shortStartDelay(_token, _startDelay)
-        shortFinishDelay(_token, _finishDelay)
-    {
+    ) public whenNotPaused notZeroAddress(_token) {
+        {
+            // Stack Too deep error fixing
+            _isTokenActive(_token); // By default, each token is inactive
+            _shortStartDelay(_token, _startDelay); // the user can't set a time parameter less than the last one
+            _shortCliffDelay(_token, _cliffDelay);
+            _shortFinishDelay(_token, _finishDelay);
+        }
         Vault storage vault = VaultMap[_token][msg.sender];
-        require(
+        require( // for the possibility of increasing only the time parameters
             _amount > 0 ||
                 _startDelay > vault.StartDelay ||
+                _cliffDelay > vault.CliffDelay ||
                 _finishDelay > vault.FinishDelay,
             "amount should be greater than zero"
         );
-        (uint256 _startMinDelay, uint256 _finishMinDelay) = GetMinDelays(
-            _token,
-            _amount
-        );
-        require(
-            _startDelay >= _startMinDelay,
-            "start delay greater than min start delay"
-        );
-        require(
-            _finishDelay >= _finishMinDelay,
-            "finish delay greater than min finish delay"
-        );
+        (
+            uint256 _startMinDelay,
+            uint256 _cliffMinDelay,
+            uint256 _finishMinDelay
+        ) = GetMinDelays(_token, _amount);
+        {
+            // Checking the minimum delay for each timing parameter.
+            _checkMinDelay(_startDelay, _startMinDelay);
+            _checkMinDelay(_cliffDelay, _cliffMinDelay);
+            _checkMinDelay(_finishDelay, _finishMinDelay);
+        }
         TransferInToken(_token, msg.sender, _amount);
         vault.Amount += _amount;
         vault.StartDelay = _startDelay;
+        vault.CliffDelay = _cliffDelay;
         vault.FinishDelay = _finishDelay;
         if (!Array.isInArray(Users[_token], msg.sender)) {
             Users[_token].push(msg.sender);
         }
         MyTokens[msg.sender].push(_token);
-        VaultMap[msg.sender][_token] = vault; // populate mapping in the reverse direction
         emit VaultValueChanged(
             _token,
             msg.sender,
             vault.Amount,
             _startDelay,
+            _cliffDelay,
             _finishDelay
         );
     }
@@ -66,6 +68,7 @@ contract DelayVault is DelayView, ERC20Helper {
         Vault storage vault = VaultMap[_token][msg.sender];
         uint256 startDelay = block.timestamp + vault.StartDelay;
         uint256 finishDelay = startDelay + vault.FinishDelay;
+        uint256 cliffDelay = startDelay + vault.CliffDelay;
         uint256 lockAmount = vault.Amount;
         vault.Amount = vault.FinishDelay = vault.StartDelay = 0;
         if (LockedDealAddress != address(0)) {
@@ -73,7 +76,7 @@ contract DelayVault is DelayView, ERC20Helper {
             ILockedDealV2(LockedDealAddress).CreateNewPool(
                 _token,
                 startDelay,
-                0,
+                cliffDelay,
                 finishDelay,
                 lockAmount,
                 msg.sender
@@ -81,6 +84,6 @@ contract DelayVault is DelayView, ERC20Helper {
         } else {
             TransferToken(_token, msg.sender, lockAmount);
         }
-        emit VaultValueChanged(_token, msg.sender, 0, 0, 0);
+        emit VaultValueChanged(_token, msg.sender, 0, 0, 0, 0);
     }
 }

@@ -19,21 +19,35 @@ contract DelayManageable is Pausable, GovManager, DelayEvents, DelayModifiers {
 
     function setMinDelays(
         address _token,
-        uint256[] memory _amounts,
-        uint256[] memory _startDelays,
-        uint256[] memory _finishDelays
-    )
-        external
-        onlyOwnerOrGov
-        notZeroAddress(_token)
-        equalValue(_amounts.length, _startDelays.length)
-        equalValue(_finishDelays.length, _startDelays.length)
-        orderedArray(_amounts)
-        orderedArray(_startDelays)
-        orderedArray(_finishDelays)
-    {
-        DelayLimit[_token] = Delay(_amounts, _startDelays, _finishDelays, true);
-        emit UpdatedMinDelays(_token, _amounts, _startDelays, _finishDelays);
+        uint256[] calldata _amounts,
+        uint256[] calldata _startDelays,
+        uint256[] calldata _cliffDelays,
+        uint256[] calldata _finishDelays
+    ) external onlyOwnerOrGov notZeroAddress(_token) {
+        {
+            // Stack Too deep error fixing
+            _equalValues(
+                _amounts.length,
+                _startDelays.length,
+                _cliffDelays.length,
+                _finishDelays.length
+            );
+            _orderedArrays(_amounts, _startDelays, _cliffDelays, _finishDelays);
+        }
+        DelayLimit[_token] = Delay(
+            _amounts,
+            _startDelays,
+            _cliffDelays,
+            _finishDelays,
+            true
+        );
+        emit UpdatedMinDelays(
+            _token,
+            _amounts,
+            _startDelays,
+            _cliffDelays,
+            _finishDelays
+        );
     }
 
     function swapTokenStatusFilter(address _token)
@@ -50,5 +64,28 @@ contract DelayManageable is Pausable, GovManager, DelayEvents, DelayModifiers {
 
     function Unpause() public onlyOwnerOrGov {
         _unpause();
+    }
+
+    function _orderedArrays(
+        uint256[] calldata _amounts,
+        uint256[] calldata _startDelays,
+        uint256[] calldata _cliffDelays,
+        uint256[] calldata _finishDelays
+    ) internal pure {
+        _orderedArray(_amounts);
+        _orderedArray(_startDelays);
+        _orderedArray(_cliffDelays);
+        _orderedArray(_finishDelays);
+    }
+
+    function _equalValues(
+        uint256 _amountsL,
+        uint256 _startDelaysL,
+        uint256 _finishDelaysL,
+        uint256 _cliffDelaysL
+    ) internal pure {
+        _equalValue(_amountsL, _startDelaysL);
+        _equalValue(_finishDelaysL, _startDelaysL);
+        _equalValue(_cliffDelaysL, _startDelaysL);
     }
 }

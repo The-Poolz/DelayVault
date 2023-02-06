@@ -12,6 +12,7 @@ contract("Delay vault admin settings", (accounts) => {
     const week = day * 7
     const amounts = [amount, amount * 2, amount * 3]
     const startDelays = [0, 0, 0]
+    const cliffDelays = [0, 0, 0]
     const finishDelays = [day, week, week * 2]
 
     before(async () => {
@@ -21,11 +22,11 @@ contract("Delay vault admin settings", (accounts) => {
 
     it("should pause contract", async () => {
         await instance.Pause()
-        await instance.setMinDelays(token.address, amounts, startDelays, finishDelays)
+        await instance.setMinDelays(token.address, amounts, startDelays, cliffDelays, finishDelays)
         await token.approve(instance.address, amount)
-        await truffleAssert.reverts(instance.CreateVault(token.address, amount, 0, week), "Pausable: paused")
+        await truffleAssert.reverts(instance.CreateVault(token.address, amount, 0, 0, week), "Pausable: paused")
         await instance.Unpause()
-        await instance.CreateVault(token.address, amount, 0, week)
+        await instance.CreateVault(token.address, amount, 0, 0, week)
     })
 
     it("should set LockedDeal", async () => {
@@ -39,7 +40,7 @@ contract("Delay vault admin settings", (accounts) => {
         const threeDays = day * 3
         const amounts = [10, 20, 30]
         const startDelays = [day, twoDays, threeDays]
-        const tx = await instance.setMinDelays(token.address, amounts, startDelays, finishDelays)
+        const tx = await instance.setMinDelays(token.address, amounts, startDelays, cliffDelays, finishDelays)
         const resAmounts = tx.logs[0].args.Amounts
         const startDelArray = tx.logs[0].args.StartDelays
         const finishDelArray = tx.logs[0].args.FinishDelays
@@ -53,17 +54,22 @@ contract("Delay vault admin settings", (accounts) => {
     it("should revert arrays with dirrent lengths", async () => {
         const invaliFinishTimes = [day, week]
         await truffleAssert.reverts(
-            instance.setMinDelays(token.address, amounts, startDelays, invaliFinishTimes),
+            instance.setMinDelays(token.address, amounts, startDelays, cliffDelays, invaliFinishTimes),
             "invalid array length"
         )
         const invalidStartDelays = [day, week]
         await truffleAssert.reverts(
-            instance.setMinDelays(token.address, amounts, invalidStartDelays, finishDelays),
+            instance.setMinDelays(token.address, amounts, invalidStartDelays, cliffDelays, finishDelays),
             "invalid array length"
         )
         const invalidAmounts = [10, 20, 30, 50]
         await truffleAssert.reverts(
-            instance.setMinDelays(token.address, invalidAmounts, startDelays, finishDelays),
+            instance.setMinDelays(token.address, invalidAmounts, startDelays, cliffDelays, finishDelays),
+            "invalid array length"
+        )
+        const invalidCliffDelays = [day, week]
+        await truffleAssert.reverts(
+            instance.setMinDelays(token.address, amounts, startDelays, invalidCliffDelays, finishDelays),
             "invalid array length"
         )
     })
@@ -76,20 +82,20 @@ contract("Delay vault admin settings", (accounts) => {
         token = await TestToken.new("TestToken", "TEST")
         await token.approve(instance.address, amount)
         await truffleAssert.reverts(
-            instance.CreateVault(token.address, amount, 0, week),
+            instance.CreateVault(token.address, amount, 0, 0, week),
             "there are no limits set for this token"
         )
     })
 
     it("should deactivate/activate token", async () => {
-        await instance.setMinDelays(token.address, amounts, startDelays, finishDelays) // isActive = true
+        await instance.setMinDelays(token.address, amounts, startDelays, cliffDelays, finishDelays) // isActive = true
         await token.approve(instance.address, amount)
         await instance.swapTokenStatusFilter(token.address) // isActive = false
         await truffleAssert.reverts(
-            instance.CreateVault(token.address, amount, week, week),
+            instance.CreateVault(token.address, amount, week, week, week),
             "there are no limits set for this token"
         )
         await instance.swapTokenStatusFilter(token.address) // isActive = true
-        await truffleAssert.passes(instance.CreateVault(token.address, amount, week, week))
+        await truffleAssert.passes(instance.CreateVault(token.address, amount, week, week, week))
     })
 })
