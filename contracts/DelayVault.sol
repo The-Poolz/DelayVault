@@ -15,10 +15,9 @@ contract DelayVault is DelayView, ERC20Helper {
         uint256 _startDelay,
         uint256 _cliffDelay,
         uint256 _finishDelay
-    ) public whenNotPaused notZeroAddress(_token) {
+    ) public whenNotPaused notZeroAddress(_token) isTokenActive(_token) {
         {
             // Stack Too deep error fixing
-            _isTokenActive(_token); // By default, each token is inactive
             _shortStartDelay(_token, _startDelay); // the user can't set a time parameter less than the last one
             _shortCliffDelay(_token, _cliffDelay);
             _shortFinishDelay(_token, _finishDelay);

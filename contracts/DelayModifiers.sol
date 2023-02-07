@@ -23,6 +23,12 @@ contract DelayModifiers is DelayData {
         );
         _;
     }
+ 
+    ///@dev By default, each token is inactive
+    modifier isTokenActive(address _token) {
+        _isTokenActive(_token);
+        _;
+    }
 
     function _isTokenActive(address _token) internal view {
         require(
