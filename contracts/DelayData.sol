@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 /// @title contain stores variables.
 contract DelayData {
     address public LockedDealAddress;
-    mapping(address => Delay) DelayLimit; // delay limit for every token
+    mapping(address => Delay) public DelayLimit; // delay limit for every token
     mapping(address => address[]) public MyTokens;
     mapping(address => mapping(address => Vault)) public VaultMap;
     mapping(address => address[]) public Users;
