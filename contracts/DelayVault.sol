@@ -43,7 +43,6 @@ contract DelayVault is DelayView, ERC20Helper {
             _checkMinDelay(_finishDelay, _finishMinDelay);
         }
         TransferInToken(_token, msg.sender, _amount);
-        vault.Amount += _amount;
         vault.StartDelay = _startDelay;
         vault.CliffDelay = _cliffDelay;
         vault.FinishDelay = _finishDelay;
@@ -54,11 +53,12 @@ contract DelayVault is DelayView, ERC20Helper {
         emit VaultValueChanged(
             _token,
             msg.sender,
-            vault.Amount,
+            _amount,
             _startDelay,
             _cliffDelay,
             _finishDelay
         );
+        vault.Amount += _amount;
     }
 
     /** @dev Creates a new pool of tokens for a specified period or,
