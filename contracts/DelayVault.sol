@@ -16,12 +16,7 @@ contract DelayVault is DelayView, ERC20Helper {
         uint256 _cliffDelay,
         uint256 _finishDelay
     ) public whenNotPaused notZeroAddress(_token) isTokenActive(_token) {
-        {
-            // Stack Too deep error fixing
-            _shortStartDelay(_token, _startDelay); // the user can't set a time parameter less than the last one
-            _shortCliffDelay(_token, _cliffDelay);
-            _shortFinishDelay(_token, _finishDelay);
-        }
+        _shortDelay(_token, _startDelay, _cliffDelay, _finishDelay); // Stack Too deep error fixing
         Vault storage vault = VaultMap[_token][msg.sender];
         require( // for the possibility of increasing only the time parameters
             _amount > 0 ||
@@ -85,5 +80,17 @@ contract DelayVault is DelayView, ERC20Helper {
             TransferToken(_token, msg.sender, lockAmount);
         }
         emit VaultValueChanged(_token, msg.sender, 0, 0, 0, 0);
+    }
+
+    /// @dev the user can't set a time parameter less than the last one
+    function _shortDelay(
+        address _token,
+        uint256 _startDelay,
+        uint256 _cliffDelay,
+        uint256 _finishDelay
+    ) internal view {
+        _shortStartDelay(_token, _startDelay);
+        _shortCliffDelay(_token, _cliffDelay);
+        _shortFinishDelay(_token, _finishDelay);
     }
 }
