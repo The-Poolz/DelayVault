@@ -70,7 +70,8 @@ contract DelayVault is DelayView, ERC20Helper {
         uint256 finishDelay = startDelay + vault.FinishDelay;
         uint256 cliffDelay = startDelay + vault.CliffDelay;
         uint256 lockAmount = vault.Amount;
-        vault.Amount = vault.FinishDelay = vault.StartDelay = 0;
+        vault.Amount = 0;
+        vault.FinishDelay = vault.CliffDelay = vault.StartDelay = 0;
         if (LockedDealAddress != address(0)) {
             ApproveAllowanceERC20(_token, LockedDealAddress, lockAmount);
             ILockedDealV2(LockedDealAddress).CreateNewPool(
