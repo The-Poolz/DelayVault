@@ -18,7 +18,6 @@ contract DelayVault is DelayView, ERC20Helper {
     ) public whenNotPaused notZeroAddress(_token) isTokenActive(_token) {
         {
             // Stack Too deep error fixing
-            _isTokenActive(_token);
             _shortStartDelay(_token, _startDelay); // the user can't set a time parameter less than the last one
             _shortCliffDelay(_token, _cliffDelay);
             _shortFinishDelay(_token, _finishDelay);
