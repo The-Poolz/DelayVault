@@ -51,7 +51,7 @@ https://github.com/The-Poolz/DelayVault/blob/a76a1825297a9126120ba47a83305f0a128
 
 - **_token** - the address of the token that will be locked in vault.
 - **_amount** - the number of tokens that will be in the vault, if there are already tokens in the vault, they will be summed up.
-- **_startDelay** - the period of time that begins after withdrawal.
+- **_startDelay** - the period of time after which the pool will start when withdraw the tokens from the vault.
 - **_cliffDelay** - time parameter that sets cliff for creating the pool. 
 - **_finishDelay** - the time for which the tokens will be locked in the pool. 
 
