@@ -50,7 +50,7 @@ contract("DelayVault", (accounts) => {
 
     it("should create vault", async () => {
         await token.approve(instance.address, amount)
-        const tx = await instance.CreateVault(token.address, amount, week, week, week * 2)
+        let tx = await instance.CreateVault(token.address, amount, week, week, week * 2)
         const tokenAddr = tx.logs[tx.logs.length - 1].args.Token
         const quantity = tx.logs[tx.logs.length - 1].args.Amount
         const startDelay = tx.logs[tx.logs.length - 1].args.StartDelay
@@ -61,6 +61,12 @@ contract("DelayVault", (accounts) => {
         assert.equal(startDelay.toString(), week.toString())
         assert.equal(finishDelay.toString(), (week * 2).toString())
         assert.equal(owner.toString(), accounts[0].toString())
+        await token.approve(instance.address, amount)
+        // create second vault
+        tx = await instance.CreateVault(token.address, amount, week, week, week * 2)
+        const newAmount = tx.logs[tx.logs.length - 1].args.Amount
+        // check full amount of the event
+        assert.equal(newAmount.toString(), (amount * 2).toString())
     })
 
     it("should revert shorter blocking period than the last one", async () => {
