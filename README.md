@@ -56,7 +56,7 @@ https://github.com/The-Poolz/DelayVault/blob/a76a1825297a9126120ba47a83305f0a128
 - **_finishDelay** - the time for which the tokens will be locked in the pool. 
 
 ## Start Lock Period
-Withdrawals create a pool of locked tokens using the [LockedDealV2](https://github.com/The-Poolz/Locked-pools) contract.
+Creates a new pool of tokens for a specified period or, if there is no [Locked Deal address](https://github.com/The-Poolz/Locked-pools), sends tokens to the owner.
 https://github.com/The-Poolz/DelayVault/blob/a76a1825297a9126120ba47a83305f0a1287a9c9/contracts/DelayVault.sol#L61
 
 - **_token** - which token do you want to withdraw.
