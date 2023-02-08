@@ -10,7 +10,7 @@ import "./DelayEvents.sol";
 /// @title all admin settings
 contract DelayManageable is Pausable, GovManager, DelayEvents, DelayModifiers {
     function setLockedDealAddress(address _lockedDealAddress)
-        public
+        external
         onlyOwnerOrGov
         uniqueAddress(_lockedDealAddress, LockedDealAddress)
     {
@@ -51,18 +51,18 @@ contract DelayManageable is Pausable, GovManager, DelayEvents, DelayModifiers {
     }
 
     function swapTokenStatusFilter(address _token)
-        public
+        external
         onlyOwnerOrGov
         notZeroAddress(_token)
     {
         DelayLimit[_token].isActive = !DelayLimit[_token].isActive;
     }
 
-    function Pause() public onlyOwnerOrGov {
+    function Pause() external onlyOwnerOrGov {
         _pause();
     }
 
-    function Unpause() public onlyOwnerOrGov {
+    function Unpause() external onlyOwnerOrGov {
         _unpause();
     }
 
@@ -71,7 +71,7 @@ contract DelayManageable is Pausable, GovManager, DelayEvents, DelayModifiers {
         uint256[] calldata _startDelays,
         uint256[] calldata _cliffDelays,
         uint256[] calldata _finishDelays
-    ) internal pure {
+    ) private pure {
         _orderedArray(_amounts);
         _orderedArray(_startDelays);
         _orderedArray(_cliffDelays);
@@ -83,7 +83,7 @@ contract DelayManageable is Pausable, GovManager, DelayEvents, DelayModifiers {
         uint256 _startDelaysL,
         uint256 _finishDelaysL,
         uint256 _cliffDelaysL
-    ) internal pure {
+    ) private pure {
         _equalValue(_amountsL, _startDelaysL);
         _equalValue(_finishDelaysL, _startDelaysL);
         _equalValue(_cliffDelaysL, _startDelaysL);

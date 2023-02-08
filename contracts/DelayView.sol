@@ -6,7 +6,7 @@ import "./DelayManageable.sol";
 /// @title DelayView - getter view functions
 contract DelayView is DelayManageable {
     function GetAllUsersData(address _token)
-        public
+        external
         view
         returns (address[] memory, Vault[] memory _vaults)
     {
@@ -18,14 +18,14 @@ contract DelayView is DelayManageable {
     }
 
     function GetAllMyTokens(address _user)
-        public
+        external
         view
         returns (address[] memory)
     {
         return MyTokens[_user];
     }
 
-    function GetMyTokens(address _user) public view returns (address[] memory) {
+    function GetMyTokens(address _user) external view returns (address[] memory) {
         address[] storage allTokens = MyTokens[_user];
         address[] memory tokens = new address[](allTokens.length);
         uint256 index;
@@ -38,7 +38,7 @@ contract DelayView is DelayManageable {
     }
 
     function GetDelayLimits(address _token)
-        public
+        external
         view
         returns (
             uint256[] memory _amount,

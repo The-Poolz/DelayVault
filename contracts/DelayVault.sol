@@ -15,7 +15,7 @@ contract DelayVault is DelayView, ERC20Helper {
         uint256 _startDelay,
         uint256 _cliffDelay,
         uint256 _finishDelay
-    ) public whenNotPaused notZeroAddress(_token) isTokenActive(_token) {
+    ) external whenNotPaused notZeroAddress(_token) isTokenActive(_token) {
         _shortDelay(_token, _startDelay, _cliffDelay, _finishDelay); // Stack Too deep error fixing
         Vault storage vault = VaultMap[_token][msg.sender];
         require( // for the possibility of increasing only the time parameters
@@ -57,7 +57,7 @@ contract DelayVault is DelayView, ERC20Helper {
     /** @dev Creates a new pool of tokens for a specified period or,
          if there is no Locked Deal address, sends tokens to the owner.
     */
-    function Withdraw(address _token) public isVaultNotEmpty(_token) {
+    function Withdraw(address _token) external isVaultNotEmpty(_token) {
         Vault storage vault = VaultMap[_token][msg.sender];
         uint256 startDelay = block.timestamp + vault.StartDelay;
         uint256 finishDelay = startDelay + vault.FinishDelay;
@@ -87,7 +87,7 @@ contract DelayVault is DelayView, ERC20Helper {
         uint256 _startDelay,
         uint256 _cliffDelay,
         uint256 _finishDelay
-    ) internal view {
+    ) private view {
         _shortStartDelay(_token, _startDelay);
         _shortCliffDelay(_token, _cliffDelay);
         _shortFinishDelay(_token, _finishDelay);
