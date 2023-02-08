@@ -30,7 +30,7 @@ contract DelayModifiers is DelayData {
         _;
     }
 
-    function _isTokenActive(address _token) internal view {
+    function _isTokenActive(address _token) private view {
         require(
             DelayLimit[_token].isActive,
             "there are no limits set for this token"
@@ -67,7 +67,7 @@ contract DelayModifiers is DelayData {
         );
     }
 
-    function _notZeroAddress(address _addr) internal pure {
+    function _notZeroAddress(address _addr) private pure {
         require(_addr != address(0), "address can't be null");
     }
 
