@@ -25,7 +25,11 @@ contract DelayView is DelayManageable {
         return MyTokens[_user];
     }
 
-    function GetMyTokens(address _user) external view returns (address[] memory) {
+    function GetMyTokens(address _user)
+        external
+        view
+        returns (address[] memory)
+    {
         address[] storage allTokens = MyTokens[_user];
         address[] memory tokens = new address[](allTokens.length);
         uint256 index;
@@ -78,5 +82,9 @@ contract DelayView is DelayManageable {
                 break;
             }
         }
+    }
+
+    function GetTokenFilterStatus(address _token) external view returns (bool) {
+        return DelayLimit[_token].isActive;
     }
 }
