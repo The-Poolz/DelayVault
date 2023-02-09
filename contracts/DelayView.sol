@@ -85,4 +85,8 @@ contract DelayView is DelayManageable {
             }
         }
     }
+
+    function GetTokenFilterStatus(address _token) external view returns (bool) {
+        return DelayLimit[_token].isActive;
+    }
 }

@@ -63,6 +63,20 @@ contract("Delay vault data", (accounts) => {
         assert.equal(delays._finishDelay.toString(), month.toString())
     })
 
+    it("get token filter status", async () => {
+        const token = await TestToken.new("TestToken", "TEST")
+        // check unknown token
+        let status = await instance.GetTokenFilterStatus(token.address)
+        assert.equal(status, false)
+        // check the state after calling the set minimum delay
+        await instance.setMinDelays(token.address, amounts, startDelays, cliffDelays, finishDelays)
+        status = await instance.GetTokenFilterStatus(token.address)
+        assert.equal(status, true)
+        await instance.swapTokenStatusFilter(token.address)
+        status = await instance.GetTokenFilterStatus(token.address)
+        assert.equal(status, false)
+    })
+
     it("should revert when not ordered amount", async () => {
         const amounts = [1000, 500, 10000]
         await truffleAssert.reverts(
