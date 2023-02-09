@@ -31,9 +31,10 @@ contract("Delay vault data", (accounts) => {
         const amounts = [10, 20, 30]
         await instance.setMinDelays(tokens[0].address, amounts, startDelays, cliffDelays, finishDelays)
         const result = await instance.GetDelayLimits(tokens[0].address)
-        assert.equal(result[0].toString(), amounts.toString())
-        assert.equal(result[1].toString(), startDelays.toString())
-        assert.equal(result[2].toString(), finishDelays.toString())
+        assert.equal(result._amount.toString(), amounts.toString())
+        assert.equal(result._startDelays.toString(), startDelays.toString())
+        assert.equal(result._cliffDelays.toString(), cliffDelays.toString())
+        assert.equal(result._finishDelays.toString(), finishDelays.toString())
     })
 
     it("get limit delays", async () => {

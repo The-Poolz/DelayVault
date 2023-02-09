@@ -25,7 +25,11 @@ contract DelayView is DelayManageable {
         return MyTokens[_user];
     }
 
-    function GetMyTokens(address _user) external view returns (address[] memory) {
+    function GetMyTokens(address _user)
+        external
+        view
+        returns (address[] memory)
+    {
         address[] storage allTokens = MyTokens[_user];
         address[] memory tokens = new address[](allTokens.length);
         uint256 index;
@@ -43,12 +47,14 @@ contract DelayView is DelayManageable {
         returns (
             uint256[] memory _amount,
             uint256[] memory _startDelays,
+            uint256[] memory _cliffDelays,
             uint256[] memory _finishDelays
         )
     {
-        (_amount, _startDelays, _finishDelays) = (
+        (_amount, _startDelays, _cliffDelays, _finishDelays) = (
             DelayLimit[_token].Amounts,
             DelayLimit[_token].StartDelays,
+            DelayLimit[_token].CliffDelays,
             DelayLimit[_token].FinishDelays
         );
     }
