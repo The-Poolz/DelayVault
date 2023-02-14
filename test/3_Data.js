@@ -115,6 +115,23 @@ contract("Delay vault data", (accounts) => {
         assert.equal(myTokens.toString(), addresses.toString())
     })
 
+    it("check my token duplicate", async () => {
+        const user = accounts[5]
+        const token = await TestToken.new("TestToken", "TEST", { from: user })
+        await token.approve(instance.address, amount)
+        await instance.setMinDelays(token.address, amounts, startDelays, cliffDelays, finishDelays)
+        await token.approve(instance.address, amount, { from: user })
+        await instance.CreateVault(token.address, amount, week, week, week, { from: user })
+        let myTokens = await instance.GetMyTokens(user)
+        assert.equal(myTokens.toString(), token.address.toString())
+        await token.approve(instance.address, amount, { from: user })
+        // expand vault
+        await instance.CreateVault(token.address, amount, week, week, week, { from: user })
+        myTokens = await instance.GetMyTokens(user)
+        // check dublication
+        assert.equal(myTokens.toString(), token.address.toString())
+    })
+
     it("should return all data", async () => {
         //create token
         token = await TestToken.new("Poolz", "$POOLZ")

@@ -43,7 +43,9 @@ contract DelayVault is DelayView, ERC20Helper {
         if (!Array.isInArray(Users[_token], msg.sender)) {
             Users[_token].push(msg.sender);
         }
-        MyTokens[msg.sender].push(_token);
+        if (!Array.isInArray(MyTokens[msg.sender], _token)) {
+            MyTokens[msg.sender].push(_token);
+        }
         emit VaultValueChanged(
             _token,
             msg.sender,
