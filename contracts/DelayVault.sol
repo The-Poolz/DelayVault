@@ -4,18 +4,27 @@ pragma solidity ^0.8.0;
 import "poolz-helper-v2/contracts/ERC20Helper.sol";
 import "poolz-helper-v2/contracts/ETHHelper.sol";
 import "poolz-helper-v2/contracts/interfaces/ILockedDealV2.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "./DelayView.sol";
 
 /// @title DelayVault core logic
 /// @author The-Poolz contract team
-contract DelayVault is DelayView, ERC20Helper {
+contract DelayVault is DelayView, ERC20Helper, ReentrancyGuard {
+    constructor() ReentrancyGuard() {}
+
     function CreateVault(
         address _token,
         uint256 _amount,
         uint256 _startDelay,
         uint256 _cliffDelay,
         uint256 _finishDelay
-    ) external whenNotPaused notZeroAddress(_token) isTokenActive(_token) {
+    )
+        external
+        whenNotPaused
+        nonReentrant
+        notZeroAddress(_token)
+        isTokenActive(_token)
+    {
         _shortDelay(_token, _startDelay, _cliffDelay, _finishDelay); // Stack Too deep error fixing
         Vault storage vault = VaultMap[_token][msg.sender];
         require( // for the possibility of increasing only the time parameters
@@ -57,7 +66,11 @@ contract DelayVault is DelayView, ERC20Helper {
     /** @dev Creates a new pool of tokens for a specified period or,
          if there is no Locked Deal address, sends tokens to the owner.
     */
-    function Withdraw(address _token) external isVaultNotEmpty(_token) {
+    function Withdraw(address _token)
+        external
+        nonReentrant
+        isVaultNotEmpty(_token)
+    {
         Vault storage vault = VaultMap[_token][msg.sender];
         uint256 startDelay = block.timestamp + vault.StartDelay;
         uint256 finishDelay = startDelay + vault.FinishDelay;
