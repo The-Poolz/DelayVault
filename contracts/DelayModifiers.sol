@@ -23,18 +23,14 @@ contract DelayModifiers is DelayData {
         );
         _;
     }
- 
+
     ///@dev By default, each token is inactive
     modifier isTokenActive(address _token) {
-        _isTokenActive(_token);
-        _;
-    }
-
-    function _isTokenActive(address _token) private view {
         require(
             DelayLimit[_token].isActive,
             "there are no limits set for this token"
         );
+        _;
     }
 
     function _shortStartDelay(address _token, uint256 _startDelay)
