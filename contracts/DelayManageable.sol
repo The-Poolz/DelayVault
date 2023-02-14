@@ -3,7 +3,6 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "poolz-helper-v2/contracts/GovManager.sol";
-import "poolz-helper-v2/contracts/interfaces/IWhiteList.sol";
 import "./DelayModifiers.sol";
 import "./DelayEvents.sol";
 
