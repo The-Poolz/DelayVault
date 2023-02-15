@@ -33,6 +33,11 @@ contract DelayModifiers is DelayData {
         _;
     }
 
+    modifier orderedArray(uint256[] memory _array) {
+        require(Array.isArrayOrdered(_array), "array should be ordered");
+        _;
+    }
+
     function _shortStartDelay(address _token, uint256 _startDelay)
         internal
         view
@@ -67,15 +72,11 @@ contract DelayModifiers is DelayData {
         require(_addr != address(0), "address can't be null");
     }
 
-    function _orderedArray(uint256[] memory _array) internal pure {
-        require(Array.isArrayOrdered(_array), "array should be ordered");
-    }
-
     function _equalValue(uint256 _fLength, uint256 _sLength) internal pure {
         require(_fLength == _sLength, "invalid array length");
     }
 
     function _checkMinDelay(uint256 _delay, uint256 _minDelay) internal pure {
-        require(_delay >= _minDelay, "delay greater than min delay");
+        require(_delay >= _minDelay, "delay less than min delay");
     }
 }
