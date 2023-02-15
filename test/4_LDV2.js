@@ -107,7 +107,6 @@ contract("DelayVault Integration tests", (accounts) => {
         for (let i = 0; i < usersArr.length; i++) {
             const tx = await delayVault.Withdraw(token.address, { from: usersArr[i] })
             const logs = tx.logs[tx.logs.length - 1].args
-            console.log(JSON.stringify(tx))
             assert.equal(logs.Token, token.address)
             assert.equal(logs.Amount, 0)
             assert.equal(logs.StartDelay, 0)
