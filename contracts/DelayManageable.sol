@@ -22,7 +22,7 @@ contract DelayManageable is Pausable, GovManager, DelayEvents, DelayModifiers {
         uint256[] calldata _startDelays,
         uint256[] calldata _cliffDelays,
         uint256[] calldata _finishDelays
-    ) external onlyOwnerOrGov notZeroAddress(_token) {
+    ) external onlyOwnerOrGov notZeroAddress(_token) orderedArray(_amounts) {
         {
             // Stack Too deep error fixing
             _equalValues(
@@ -31,7 +31,6 @@ contract DelayManageable is Pausable, GovManager, DelayEvents, DelayModifiers {
                 _cliffDelays.length,
                 _finishDelays.length
             );
-            _orderedArrays(_amounts, _startDelays, _cliffDelays, _finishDelays);
         }
         DelayLimit[_token] = Delay(
             _amounts,
@@ -63,18 +62,6 @@ contract DelayManageable is Pausable, GovManager, DelayEvents, DelayModifiers {
 
     function Unpause() external onlyOwnerOrGov {
         _unpause();
-    }
-
-    function _orderedArrays(
-        uint256[] calldata _amounts,
-        uint256[] calldata _startDelays,
-        uint256[] calldata _cliffDelays,
-        uint256[] calldata _finishDelays
-    ) private pure {
-        _orderedArray(_amounts);
-        _orderedArray(_startDelays);
-        _orderedArray(_cliffDelays);
-        _orderedArray(_finishDelays);
     }
 
     function _equalValues(

@@ -1,0 +1,1 @@
+cp -a ./node_modules/poolz-locked-deal-v2/contracts/. ./contracts/LockedDealV2

@@ -70,12 +70,12 @@ contract DelayView is DelayManageable {
         )
     {
         Delay memory delayLimit = DelayLimit[_token];
-        if (delayLimit.Amounts.length == 0 || delayLimit.Amounts[0] > _amount)
-            return (0, 0, 0);
+        uint256 arrLength = delayLimit.Amounts.length;
+        if (arrLength == 0 || delayLimit.Amounts[0] > _amount) return (0, 0, 0);
         _startDelay = delayLimit.StartDelays[0];
         _cliffDelay = delayLimit.CliffDelays[0];
         _finishDelay = delayLimit.FinishDelays[0];
-        for (uint256 i = 0; i < delayLimit.Amounts.length; i++) {
+        for (uint256 i = 0; i < arrLength; i++) {
             if (_amount >= delayLimit.Amounts[i]) {
                 _startDelay = delayLimit.StartDelays[i];
                 _cliffDelay = delayLimit.CliffDelays[i];
