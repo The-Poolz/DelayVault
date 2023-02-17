@@ -14,6 +14,7 @@ contract DelayData {
         uint256 StartDelay;
         uint256 CliffDelay;
         uint256 FinishDelay;
+        bool Exist;
     }
 
     struct Delay {

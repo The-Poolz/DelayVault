@@ -49,8 +49,11 @@ contract DelayVault is DelayView, ERC20Helper, ReentrancyGuard {
         vault.StartDelay = _startDelay;
         vault.CliffDelay = _cliffDelay;
         vault.FinishDelay = _finishDelay;
-        Array.addIfNotExsist(Users[_token], msg.sender);
-        Array.addIfNotExsist(MyTokens[msg.sender], _token);
+        if (!vault.Exist) {
+            Users[_token].push(msg.sender);
+            MyTokens[msg.sender].push(_token);
+            vault.Exist = true;
+        }
         emit VaultValueChanged(
             _token,
             msg.sender,
