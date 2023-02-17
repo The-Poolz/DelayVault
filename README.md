@@ -36,7 +36,7 @@ truffle migrate --network dashboard
 ```
 
 ## UML
-![classDiagram](https://user-images.githubusercontent.com/68740472/217502566-6827d515-761f-4542-880f-8d48817858b6.svg)
+![classDiagram](https://user-images.githubusercontent.com/68740472/219604344-5cc4fb18-9312-4aeb-99d6-2cfa632e659f.svg)
 
 ## Create new Vault
 **Problem:**
@@ -68,7 +68,7 @@ https://github.com/The-Poolz/DelayVault/blob/35eba8d1dc7ba9db7edbf39ad73441e05c5
 - **_lockedDealAddress** - the new address of the Locked-Pools. Its default address is zero.
 
 #### Setting Minimum Delays
-The administrator can set the minimum delay time and the minimum number of blocked tokens. Each token limit can have its own minimum block time. When setting limits, they should be sorted from smallest to largest. 
+The administrator can set the minimum delay time and the minimum number of blocked tokens. Each token limit can have its own minimum block time. When setting amounts, they should be sorted from smallest to largest. 
 https://github.com/The-Poolz/DelayVault/blob/35eba8d1dc7ba9db7edbf39ad73441e05c58e78d/contracts/DelayManageable.sol#L20-L26
 If restrictions are set, the user will not be able to specify a lower value. The admin can specify his own minimum block time for a certain number of tokens.
 - **_token** - the address of the token to which the blocking rules will apply.
