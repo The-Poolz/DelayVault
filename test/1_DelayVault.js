@@ -85,7 +85,7 @@ contract("DelayVault", (accounts) => {
     it("should revert when empty vault", async () => {
         const token = await TestToken.new("TestToken", "TEST")
         await instance.setLockedDealAddress(accounts[1])
-        await truffleAssert.reverts(instance.Withdraw(token.address), "vault is already empty")
+        await truffleAssert.reverts(instance.Withdraw(token.address, amount), "vault is already empty")
     })
 
     it("should revert zero amount", async () => {
@@ -108,7 +108,7 @@ contract("DelayVault", (accounts) => {
         await instance.CreateVault(token.address, amount, week, week, week, { from: owner })
         const oldOwnerBalance = await token.balanceOf(owner)
         assert.equal(oldOwnerBalance.toString(), 0)
-        await instance.Withdraw(token.address, { from: owner })
+        await instance.Withdraw(token.address, amount, { from: owner })
         const ownerBalance = await token.balanceOf(owner)
         assert.notEqual(ownerBalance, oldOwnerBalance)
         assert.equal(ownerBalance.toString(), amount.toString())

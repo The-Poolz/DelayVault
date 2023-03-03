@@ -18,4 +18,9 @@ contract DelayEvents {
         uint256[] CliffDelays,
         uint256[] FinishDelays
     );
+    event VaultApproval(
+        address indexed Token,
+        address indexed Spender,
+        uint256 Amount
+    );
 }

@@ -10,8 +10,6 @@ import "./DelayView.sol";
 /// @title DelayVault core logic
 /// @author The-Poolz contract team
 contract DelayVault is DelayView, ERC20Helper, ReentrancyGuard {
-    constructor() ReentrancyGuard() {}
-
     function CreateVault(
         address _token,
         uint256 _amount,
@@ -64,32 +62,13 @@ contract DelayVault is DelayView, ERC20Helper, ReentrancyGuard {
     /** @dev Creates a new pool of tokens for a specified period or,
          if there is no Locked Deal address, sends tokens to the owner.
     */
-    function Withdraw(address _token)
+    function Withdraw(address _token, uint256 _amount)
         external
         nonReentrant
-        isVaultNotEmpty(_token)
+        isVaultNotEmpty(_token, msg.sender)
+        notZeroValue(_amount)
     {
-        Vault storage vault = VaultMap[_token][msg.sender];
-        uint256 startDelay = block.timestamp + vault.StartDelay;
-        uint256 finishDelay = startDelay + vault.FinishDelay;
-        uint256 cliffDelay = startDelay + vault.CliffDelay;
-        uint256 lockAmount = vault.Amount;
-        vault.Amount = 0;
-        vault.FinishDelay = vault.CliffDelay = vault.StartDelay = 0;
-        if (LockedDealAddress != address(0)) {
-            ApproveAllowanceERC20(_token, LockedDealAddress, lockAmount);
-            ILockedDealV2(LockedDealAddress).CreateNewPool(
-                _token,
-                startDelay,
-                cliffDelay,
-                finishDelay,
-                lockAmount,
-                msg.sender
-            );
-        } else {
-            TransferToken(_token, msg.sender, lockAmount);
-        }
-        emit VaultValueChanged(_token, msg.sender, 0, 0, 0, 0);
+        _withdraw(_token, msg.sender, msg.sender, _amount);
     }
 
     /// @dev the user can't set a time parameter less than the last one
@@ -102,5 +81,63 @@ contract DelayVault is DelayView, ERC20Helper, ReentrancyGuard {
         _shortStartDelay(_token, _startDelay);
         _shortCliffDelay(_token, _cliffDelay);
         _shortFinishDelay(_token, _finishDelay);
+    }
+
+    function ApproveAllowance(
+        address _token,
+        address _spender,
+        uint256 _amount
+    ) public notZeroAddress(_token) notZeroAddress(_spender) {
+        Allowance[_token][_spender] = _amount;
+        emit VaultApproval(_token, _spender, _amount);
+    }
+
+    function WithdrawFrom(
+        address _token,
+        address _owner,
+        address _spender,
+        uint256 _amount
+    )
+        external
+        isVaultNotEmpty(_token, _owner)
+        notZeroAddress(_spender)
+        notZeroValue(_amount)
+        nonReentrant
+    {
+        require(
+            Allowance[_token][_spender] > 0 &&
+                Allowance[_token][_spender] >= _amount,
+            "DelayVault: insufficient allowance"
+        );
+        _withdraw(_token, _owner, _spender, _amount);
+        ApproveAllowance(_token, _spender, _amount);
+    }
+
+    function _withdraw(
+        address _token,
+        address _owner,
+        address _to,
+        uint256 _amount
+    ) internal {
+        Vault storage vault = VaultMap[_token][_owner];
+        uint256 startDelay = block.timestamp + vault.StartDelay;
+        uint256 finishDelay = startDelay + vault.FinishDelay;
+        uint256 cliffDelay = startDelay + vault.CliffDelay;
+        if ((vault.Amount -= _amount) == 0)
+            vault.FinishDelay = vault.CliffDelay = vault.StartDelay = 0;
+        if (LockedDealAddress != address(0)) {
+            ApproveAllowanceERC20(_token, LockedDealAddress, _amount);
+            ILockedDealV2(LockedDealAddress).CreateNewPool(
+                _token,
+                startDelay,
+                cliffDelay,
+                finishDelay,
+                _amount,
+                _to
+            );
+        } else {
+            TransferToken(_token, _to, _amount);
+        }
+        emit VaultValueChanged(_token, _owner, vault.Amount, 0, 0, 0);
     }
 }
