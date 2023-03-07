@@ -83,14 +83,18 @@ contract DelayManageable is
     }
 
     /// @dev withdraw Leftovers ERC-20 tokens from contract
-    function WithdrawLeftovers(address _token, uint256 _amount)
+    function WithdrawLeftovers(
+        address _token,
+        address _to,
+        uint256 _amount
+    )
         external
         onlyOwnerOrGov
         notZeroAddress(_token)
         validAmount(Leftovers[_token], _amount)
     {
-        TransferToken(_token, msg.sender, _amount);
         Leftovers[_token] -= _amount;
-        emit WithdrawnLeftovers(_token, msg.sender, _amount);
+        TransferToken(_token, _to, _amount);
+        emit WithdrawnLeftovers(_token, _to, _amount);
     }
 }
