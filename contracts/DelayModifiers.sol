@@ -16,13 +16,16 @@ contract DelayModifiers is DelayData {
         _;
     }
 
-    modifier notZeroValue(uint256 _value) {
-        require(_value > 0, "amount can't be null");
+    modifier isVaultNotEmpty(address _token) {
+        require(
+            VaultMap[_token][msg.sender].Amount > 0,
+            "vault is already empty"
+        );
         _;
     }
 
-    modifier isVaultNotEmpty(address _token, address _owner) {
-        require(VaultMap[_token][_owner].Amount > 0, "vault is already empty");
+    modifier validAmount(uint256 _fAmount, uint256 _sAmount) {
+        require(_fAmount >= _sAmount, "invalid amount");
         _;
     }
 

@@ -98,4 +98,26 @@ contract("Delay vault admin settings", (accounts) => {
         await instance.swapTokenStatusFilter(token.address) // isActive = true
         await truffleAssert.passes(instance.CreateVault(token.address, amount, week, week, week))
     })
+
+    it("Leftover tokens from contract", async () => {
+        const token = await TestToken.new("TestToken", "TEST", { from: accounts[1] })
+        const oldBal = await token.balanceOf(accounts[0])
+        assert.equal(oldBal, 0)
+        await token.approve(instance.address, amount, { from: accounts[1] })
+        await instance.swapTokenStatusFilter(token.address)
+        await instance.CreateVault(token.address, amount, week, week, week * 2, { from: accounts[1] })
+        await truffleAssert.reverts(instance.WithdrawLeftovers(token.address, amount / 2), "invalid amount")
+        // buy back half tokens
+        await instance.BuyBackTokens(token.address, amount / 2, { from: accounts[1] })
+        // withdraw tokens from contract
+        const tx = await instance.WithdrawLeftovers(token.address, amount / 2)
+        // check events values
+        assert.equal(tx.logs[tx.logs.length - 1].args.Token.toString(), token.address.toString())
+        assert.equal(tx.logs[tx.logs.length - 1].args.To.toString(), accounts[0])
+        assert.equal(tx.logs[tx.logs.length - 1].args.Amount.toString(), amount / 2)
+        // check current balance
+        const bal = await token.balanceOf(accounts[0])
+        assert.equal(bal, amount / 2)
+        assert.notEqual(oldBal, bal)
+    })
 })

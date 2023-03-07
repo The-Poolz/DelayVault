@@ -85,7 +85,7 @@ contract("DelayVault", (accounts) => {
     it("should revert when empty vault", async () => {
         const token = await TestToken.new("TestToken", "TEST")
         await instance.setLockedDealAddress(accounts[1])
-        await truffleAssert.reverts(instance.Withdraw(token.address, amount), "vault is already empty")
+        await truffleAssert.reverts(instance.Withdraw(token.address), "vault is already empty")
     })
 
     it("should revert zero amount", async () => {
@@ -108,9 +108,28 @@ contract("DelayVault", (accounts) => {
         await instance.CreateVault(token.address, amount, week, week, week, { from: owner })
         const oldOwnerBalance = await token.balanceOf(owner)
         assert.equal(oldOwnerBalance.toString(), 0)
-        await instance.Withdraw(token.address, amount, { from: owner })
+        await instance.Withdraw(token.address, { from: owner })
         const ownerBalance = await token.balanceOf(owner)
         assert.notEqual(ownerBalance, oldOwnerBalance)
         assert.equal(ownerBalance.toString(), amount.toString())
+    })
+
+    it("buy back tokens", async () => {
+        const token = await TestToken.new("TestToken", "TEST", { from: accounts[1] })
+        await token.approve(instance.address, amount, { from: accounts[1] })
+        await instance.swapTokenStatusFilter(token.address)
+        await instance.CreateVault(token.address, amount, week, week, week * 2, { from: accounts[1] })
+        // buy back half tokens
+        const tx = await instance.BuyBackTokens(token.address, amount / 2, { from: accounts[1] })
+        // check events results
+        assert.equal(tx.logs[tx.logs.length - 1].args.Token, token.address)
+        assert.equal(tx.logs[tx.logs.length - 1].args.Amount, (amount / 2).toString())
+        assert.equal(tx.logs[tx.logs.length - 1].args.RemaningAmount, (amount / 2).toString())
+        // check vault data
+        const data = await instance.VaultMap(token.address, accounts[1])
+        assert.equal(data.Amount, (amount / 2).toString())
+        assert.equal(data.StartDelay, week.toString())
+        assert.equal(data.CliffDelay, week.toString())
+        assert.equal(data.FinishDelay, (week * 2).toString())
     })
 })

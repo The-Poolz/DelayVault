@@ -18,9 +18,14 @@ contract DelayEvents {
         uint256[] CliffDelays,
         uint256[] FinishDelays
     );
-    event VaultApproval(
+    event BoughtBackTokens(
         address indexed Token,
-        address indexed Spender,
+        uint256 Amount,
+        uint256 RemaningAmount
+    );
+    event WithdrawnLeftovers(
+        address indexed Token,
+        address indexed To,
         uint256 Amount
     );
 }

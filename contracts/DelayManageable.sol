@@ -3,11 +3,18 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "poolz-helper-v2/contracts/GovManager.sol";
+import "poolz-helper-v2/contracts/ERC20Helper.sol";
 import "./DelayModifiers.sol";
 import "./DelayEvents.sol";
 
 /// @title all admin settings
-contract DelayManageable is Pausable, GovManager, DelayEvents, DelayModifiers {
+contract DelayManageable is
+    Pausable,
+    GovManager,
+    DelayEvents,
+    DelayModifiers,
+    ERC20Helper
+{
     function setLockedDealAddress(address _lockedDealAddress)
         external
         onlyOwnerOrGov
@@ -73,5 +80,17 @@ contract DelayManageable is Pausable, GovManager, DelayEvents, DelayModifiers {
         _equalValue(_amountsL, _startDelaysL);
         _equalValue(_finishDelaysL, _startDelaysL);
         _equalValue(_cliffDelaysL, _startDelaysL);
+    }
+
+    /// @dev withdraw Leftovers ERC-20 tokens from contract
+    function WithdrawLeftovers(address _token, uint256 _amount)
+        external
+        onlyOwnerOrGov
+        notZeroAddress(_token)
+        validAmount(Leftovers[_token], _amount)
+    {
+        TransferToken(_token, msg.sender, _amount);
+        Leftovers[_token] -= _amount;
+        emit WithdrawnLeftovers(_token, msg.sender, _amount);
     }
 }
