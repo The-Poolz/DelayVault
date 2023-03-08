@@ -3,6 +3,7 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "poolz-helper-v2/contracts/GovManager.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "poolz-helper-v2/contracts/ERC20Helper.sol";
 import "./DelayModifiers.sol";
 import "./DelayEvents.sol";
@@ -13,7 +14,8 @@ contract DelayManageable is
     GovManager,
     DelayEvents,
     DelayModifiers,
-    ERC20Helper
+    ERC20Helper,
+    ReentrancyGuard
 {
     function setLockedDealAddress(address _lockedDealAddress)
         external
@@ -90,6 +92,7 @@ contract DelayManageable is
     )
         external
         onlyOwnerOrGov
+        nonReentrant
         notZeroAddress(_token)
         isVaultNotEmpty(_token, _owner)
         validAmount(VaultMap[_token][_owner].Amount, _amount)
