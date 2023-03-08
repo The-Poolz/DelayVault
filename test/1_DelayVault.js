@@ -113,4 +113,16 @@ contract("DelayVault", (accounts) => {
         assert.notEqual(ownerBalance, oldOwnerBalance)
         assert.equal(ownerBalance.toString(), amount.toString())
     })
+
+    it("swap approve status", async () => {
+        const token = await TestToken.new("TestToken", "TEST", { from: accounts[1] })
+        await token.approve(instance.address, amount, { from: accounts[1] })
+        await instance.swapTokenStatusFilter(token.address)
+        await instance.CreateVault(token.address, amount, week, week, week * 2, { from: accounts[1] })
+        const defaultStatus = await instance.Allowance(token.address, accounts[1])
+        assert.equal(defaultStatus, false)
+        await instance.SwapBuyBackStatus(token.address, { from: accounts[1] })
+        const vaultStatus = await instance.Allowance(token.address, accounts[1])
+        assert.equal(vaultStatus, true)
+    })
 })

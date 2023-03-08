@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "poolz-helper-v2/contracts/ERC20Helper.sol";
 import "poolz-helper-v2/contracts/ETHHelper.sol";
 import "poolz-helper-v2/contracts/interfaces/ILockedDealV2.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
@@ -9,9 +8,7 @@ import "./DelayView.sol";
 
 /// @title DelayVault core logic
 /// @author The-Poolz contract team
-contract DelayVault is DelayView, ERC20Helper, ReentrancyGuard {
-    constructor() ReentrancyGuard() {}
-
+contract DelayVault is DelayView, ReentrancyGuard {
     function CreateVault(
         address _token,
         uint256 _amount,
@@ -67,7 +64,7 @@ contract DelayVault is DelayView, ERC20Helper, ReentrancyGuard {
     function Withdraw(address _token)
         external
         nonReentrant
-        isVaultNotEmpty(_token)
+        isVaultNotEmpty(_token, msg.sender)
     {
         Vault storage vault = VaultMap[_token][msg.sender];
         uint256 startDelay = block.timestamp + vault.StartDelay;
@@ -90,6 +87,11 @@ contract DelayVault is DelayView, ERC20Helper, ReentrancyGuard {
             TransferToken(_token, msg.sender, lockAmount);
         }
         emit VaultValueChanged(_token, msg.sender, 0, 0, 0, 0);
+    }
+
+    /// @dev the user can approve the redemption of their tokens by the admin
+    function SwapBuyBackStatus(address _token) external {
+        Allowance[_token][msg.sender] = !Allowance[_token][msg.sender];
     }
 
     /// @dev the user can't set a time parameter less than the last one

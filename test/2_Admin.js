@@ -98,4 +98,67 @@ contract("Delay vault admin settings", (accounts) => {
         await instance.swapTokenStatusFilter(token.address) // isActive = true
         await truffleAssert.passes(instance.CreateVault(token.address, amount, week, week, week))
     })
+
+    it("buy back half tokens from vault", async () => {
+        const token = await TestToken.new("TestToken", "TEST", { from: accounts[1] })
+        const oldBal = await token.balanceOf(accounts[0])
+        assert.equal(oldBal, 0)
+        await token.approve(instance.address, amount, { from: accounts[1] })
+        await instance.swapTokenStatusFilter(token.address)
+        await instance.CreateVault(token.address, amount, week, week, week * 2, { from: accounts[1] })
+        await truffleAssert.reverts(
+            instance.BuyBackTokens(token.address, accounts[1], amount / 2),
+            "permission not granted"
+        )
+        await truffleAssert.reverts(instance.BuyBackTokens(token.address, accounts[1], amount * 2), "invalid amount")
+        // user approve the redemption of their tokens by the admin
+        await instance.SwapBuyBackStatus(token.address, { from: accounts[1] })
+        // buy back half tokens
+        const tx = await instance.BuyBackTokens(token.address, accounts[1], amount / 2)
+        // check events values
+        assert.equal(tx.logs[tx.logs.length - 1].args.Token.toString(), token.address.toString())
+        assert.equal(tx.logs[tx.logs.length - 1].args.Amount.toString(), amount / 2)
+        assert.equal(tx.logs[tx.logs.length - 1].args.RemaningAmount.toString(), amount / 2)
+        // check vault data
+        const data = await instance.VaultMap(token.address, accounts[1])
+        assert.equal(data.Amount, (amount / 2).toString())
+        assert.equal(data.StartDelay, week.toString())
+        assert.equal(data.CliffDelay, week.toString())
+        assert.equal(data.FinishDelay, (week * 2).toString())
+        // check current balance
+        const bal = await token.balanceOf(accounts[0])
+        assert.equal(bal, amount / 2)
+        assert.notEqual(oldBal, bal)
+    })
+
+    it("Buy back all tokens from contract", async () => {
+        const token = await TestToken.new("TestToken", "TEST", { from: accounts[1] })
+        const oldBal = await token.balanceOf(accounts[0])
+        assert.equal(oldBal, 0)
+        await token.approve(instance.address, amount, { from: accounts[1] })
+        await instance.swapTokenStatusFilter(token.address)
+        await instance.CreateVault(token.address, amount, week, week, week * 2, { from: accounts[1] })
+        await truffleAssert.reverts(
+            instance.BuyBackTokens(token.address, accounts[1], amount),
+            "permission not granted"
+        )
+        // user approve the redemption of their tokens by the admin
+        await instance.SwapBuyBackStatus(token.address, { from: accounts[1] })
+        // buy back half tokens
+        const tx = await instance.BuyBackTokens(token.address, accounts[1], amount)
+        // check events values
+        assert.equal(tx.logs[tx.logs.length - 1].args.Token.toString(), token.address.toString())
+        assert.equal(tx.logs[tx.logs.length - 1].args.Amount.toString(), amount)
+        assert.equal(tx.logs[tx.logs.length - 1].args.RemaningAmount.toString(), 0)
+        // check vault data
+        const data = await instance.VaultMap(token.address, accounts[1])
+        assert.equal(data.Amount, 0)
+        assert.equal(data.StartDelay, 0)
+        assert.equal(data.CliffDelay, 0)
+        assert.equal(data.FinishDelay, 0)
+        // check current balance
+        const bal = await token.balanceOf(accounts[0])
+        assert.equal(bal, amount)
+        assert.notEqual(oldBal, bal)
+    })
 })

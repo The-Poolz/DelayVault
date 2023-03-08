@@ -18,4 +18,9 @@ contract DelayEvents {
         uint256[] CliffDelays,
         uint256[] FinishDelays
     );
+    event BoughtBackTokens(
+        address indexed Token,
+        uint256 Amount,
+        uint256 RemaningAmount
+    );
 }
