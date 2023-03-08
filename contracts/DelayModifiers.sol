@@ -16,11 +16,8 @@ contract DelayModifiers is DelayData {
         _;
     }
 
-    modifier isVaultNotEmpty(address _token) {
-        require(
-            VaultMap[_token][msg.sender].Amount > 0,
-            "vault is already empty"
-        );
+    modifier isVaultNotEmpty(address _token, address _owner) {
+        require(VaultMap[_token][_owner].Amount > 0, "vault is already empty");
         _;
     }
 

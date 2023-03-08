@@ -114,41 +114,15 @@ contract("DelayVault", (accounts) => {
         assert.equal(ownerBalance.toString(), amount.toString())
     })
 
-    it("buy back half tokens", async () => {
+    it("swap approve status", async () => {
         const token = await TestToken.new("TestToken", "TEST", { from: accounts[1] })
         await token.approve(instance.address, amount, { from: accounts[1] })
         await instance.swapTokenStatusFilter(token.address)
         await instance.CreateVault(token.address, amount, week, week, week * 2, { from: accounts[1] })
-        // buy back half tokens
-        const tx = await instance.BuyBackTokens(token.address, amount / 2, { from: accounts[1] })
-        // check events results
-        assert.equal(tx.logs[tx.logs.length - 1].args.Token, token.address)
-        assert.equal(tx.logs[tx.logs.length - 1].args.Amount, (amount / 2).toString())
-        assert.equal(tx.logs[tx.logs.length - 1].args.RemaningAmount, (amount / 2).toString())
-        // check vault data
-        const data = await instance.VaultMap(token.address, accounts[1])
-        assert.equal(data.Amount, (amount / 2).toString())
-        assert.equal(data.StartDelay, week.toString())
-        assert.equal(data.CliffDelay, week.toString())
-        assert.equal(data.FinishDelay, (week * 2).toString())
-    })
-
-    it("buy back all tokens", async () => {
-        const token = await TestToken.new("TestToken", "TEST", { from: accounts[1] })
-        await token.approve(instance.address, amount, { from: accounts[1] })
-        await instance.swapTokenStatusFilter(token.address)
-        await instance.CreateVault(token.address, amount, week, week, week * 2, { from: accounts[1] })
-        // buy back all tokens
-        const tx = await instance.BuyBackTokens(token.address, amount, { from: accounts[1] })
-        // check events results
-        assert.equal(tx.logs[tx.logs.length - 1].args.Token, token.address)
-        assert.equal(tx.logs[tx.logs.length - 1].args.Amount, amount.toString())
-        assert.equal(tx.logs[tx.logs.length - 1].args.RemaningAmount, 0)
-        // check vault data
-        const data = await instance.VaultMap(token.address, accounts[1])
-        assert.equal(data.Amount, 0)
-        assert.equal(data.StartDelay, 0)
-        assert.equal(data.CliffDelay, 0)
-        assert.equal(data.FinishDelay, 0)
+        const defaultStatus = await instance.Allowance(token.address, accounts[1])
+        assert.equal(defaultStatus, false)
+        await instance.SwapBuyBackStatus(token.address, { from: accounts[1] })
+        const vaultStatus = await instance.Allowance(token.address, accounts[1])
+        assert.equal(vaultStatus, true)
     })
 })

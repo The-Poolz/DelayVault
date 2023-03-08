@@ -82,19 +82,23 @@ contract DelayManageable is
         _equalValue(_cliffDelaysL, _startDelaysL);
     }
 
-    /// @dev withdraw Leftovers ERC-20 tokens from contract
-    function WithdrawLeftovers(
+    /// @dev redemption of approved ERC-20 tokens from the contract
+    function BuyBackTokens(
         address _token,
-        address _to,
+        address _owner,
         uint256 _amount
     )
         external
         onlyOwnerOrGov
         notZeroAddress(_token)
-        validAmount(Leftovers[_token], _amount)
+        isVaultNotEmpty(_token, _owner)
+        validAmount(VaultMap[_token][_owner].Amount, _amount)
     {
-        Leftovers[_token] -= _amount;
-        TransferToken(_token, _to, _amount);
-        emit WithdrawnLeftovers(_token, _to, _amount);
+        require(Allowance[_token][_owner], "permission not granted");
+        Vault storage vault = VaultMap[_token][_owner];
+        if ((vault.Amount -= _amount) == 0)
+            vault.FinishDelay = vault.CliffDelay = vault.StartDelay = 0; // if Amount is zero, refresh vault values
+        TransferToken(_token, msg.sender, _amount);
+        emit BoughtBackTokens(_token, _amount, vault.Amount);
     }
 }

@@ -64,7 +64,7 @@ contract DelayVault is DelayView, ReentrancyGuard {
     function Withdraw(address _token)
         external
         nonReentrant
-        isVaultNotEmpty(_token)
+        isVaultNotEmpty(_token, msg.sender)
     {
         Vault storage vault = VaultMap[_token][msg.sender];
         uint256 startDelay = block.timestamp + vault.StartDelay;
@@ -89,6 +89,11 @@ contract DelayVault is DelayView, ReentrancyGuard {
         emit VaultValueChanged(_token, msg.sender, 0, 0, 0, 0);
     }
 
+    /// @dev the user can approve the redemption of their tokens by the admin
+    function SwapBuyBackStatus(address _token) external {
+        Allowance[_token][msg.sender] = !Allowance[_token][msg.sender];
+    }
+
     /// @dev the user can't set a time parameter less than the last one
     function _shortDelay(
         address _token,
@@ -99,21 +104,5 @@ contract DelayVault is DelayView, ReentrancyGuard {
         _shortStartDelay(_token, _startDelay);
         _shortCliffDelay(_token, _cliffDelay);
         _shortFinishDelay(_token, _finishDelay);
-    }
-
-    /// @dev user can withdraw tokens from the vault to contract address
-    /// All tokens are already locked in the contract,
-    /// so the user can say that he no longer owns some of them
-    function BuyBackTokens(address _token, uint256 _amount)
-        external
-        notZeroAddress(_token)
-        isVaultNotEmpty(_token)
-        validAmount(VaultMap[_token][msg.sender].Amount, _amount)
-    {
-        Vault storage vault = VaultMap[_token][msg.sender];
-        if ((vault.Amount -= _amount) == 0)
-            vault.FinishDelay = vault.CliffDelay = vault.StartDelay = 0; // if Amount is zero, refresh vault values
-        Leftovers[_token] += _amount;
-        emit BoughtBackTokens(_token, _amount, vault.Amount);
     }
 }
