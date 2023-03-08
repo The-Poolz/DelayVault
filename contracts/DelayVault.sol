@@ -3,12 +3,11 @@ pragma solidity ^0.8.0;
 
 import "poolz-helper-v2/contracts/ETHHelper.sol";
 import "poolz-helper-v2/contracts/interfaces/ILockedDealV2.sol";
-import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "./DelayView.sol";
 
 /// @title DelayVault core logic
 /// @author The-Poolz contract team
-contract DelayVault is DelayView, ReentrancyGuard {
+contract DelayVault is DelayView {
     function CreateVault(
         address _token,
         uint256 _amount,
