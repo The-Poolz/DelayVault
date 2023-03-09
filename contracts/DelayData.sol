@@ -5,11 +5,11 @@ pragma solidity ^0.8.0;
 contract DelayData {
     address public LockedDealAddress;
     mapping(address => Delay) public DelayLimit; // delay limit for every token
-    mapping(address => address[]) public MyTokens;
-    mapping(address => address[]) public Users;
     mapping(address => mapping(address => Vault)) public VaultMap;
     mapping(address => mapping(address => bool)) public Allowance;
-
+    mapping(address => address[]) public MyTokens;
+    mapping(address => address[]) public Users;
+    
     struct Vault {
         uint256 Amount;
         uint256 StartDelay;
