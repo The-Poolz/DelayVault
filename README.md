@@ -36,7 +36,7 @@ truffle migrate --network dashboard
 ```
 
 ## UML
-![classDiagram](https://user-images.githubusercontent.com/68740472/219604344-5cc4fb18-9312-4aeb-99d6-2cfa632e659f.svg)
+![classDiagram](https://user-images.githubusercontent.com/68740472/224293292-a86ff2cf-b91a-4e24-9ce6-1fbc9065916b.svg)
 
 ## Create new Vault
 **Problem:**
@@ -61,6 +61,11 @@ https://github.com/The-Poolz/DelayVault/blob/a76a1825297a9126120ba47a83305f0a128
 
 - **_token** - which token do you want to withdraw.
 
+## Swap Buy Back Status 
+By default, the admin can't purchase user tokens. Withdrawal rights are defined by the user using the `SwapBuyBackStatus` function. If the user changes his mind about allowing the administrator to redeem tokens from the vault, he must repeat the function call.
+https://github.com/The-Poolz/DelayVault/blob/03490e948a05f6556d0571e8781547ec42387ed1/contracts/DelayVault.sol#L91-L92
+- **_token** - which token will be approved for redemption.
+
 ## Admin settings
 #### Set Locked Deal address
 `setLockedDealAddress` allows the admin to set the address of the **LockedDealV2** contract. Without a **Locked-Deal** address, the user will immediately receive their tokens upon withdrawal!
@@ -68,7 +73,7 @@ https://github.com/The-Poolz/DelayVault/blob/35eba8d1dc7ba9db7edbf39ad73441e05c5
 - **_lockedDealAddress** - the new address of the Locked-Pools. Its default address is zero.
 
 #### Setting Minimum Delays
-The administrator can set the minimum delay time and the minimum number of blocked tokens. Each token limit can have its own minimum block time. When setting amounts, they should be sorted from smallest to largest. 
+Administrator can set the minimum delay time and the minimum number of blocked tokens. Each token limit can have its own minimum block time. When setting amounts, they should be sorted from smallest to largest. 
 https://github.com/The-Poolz/DelayVault/blob/35eba8d1dc7ba9db7edbf39ad73441e05c58e78d/contracts/DelayManageable.sol#L20-L26
 If restrictions are set, the user will not be able to specify a lower value. The admin can specify his own minimum block time for a certain number of tokens.
 - **_token** - the address of the token to which the blocking rules will apply.
@@ -76,6 +81,14 @@ If restrictions are set, the user will not be able to specify a lower value. The
 - **_startDelays** - array of delay start limits. 
 - **_cliffDelays** - array of output time limits in the pool.
 - **_finishDelays** - array of pool end limits.
+
+#### Buy back tokens
+After the user's approval, the admin can withdraw tokens from the vault. By specifying the address of the token, the owner of the vault and the amount to be withdrawn.
+If the admin withdraws the entire amount, the vault time limits are reset to zero.
+https://github.com/The-Poolz/DelayVault/blob/03490e948a05f6556d0571e8781547ec42387ed1/contracts/DelayManageable.sol#L87-L92
+- **_token** - the address of the token to which the output will be applied 
+- **_owner** - a vault owner who has approved a buyout of their funds.
+- **_amount** - number of tokens to be withdrawn.
 
 ## License
 The-Poolz Contracts is released under the MIT License.
