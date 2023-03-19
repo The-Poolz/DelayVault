@@ -75,7 +75,7 @@ contract DelayView is DelayManageable {
         _startDelay = delayLimit.StartDelays[0];
         _cliffDelay = delayLimit.CliffDelays[0];
         _finishDelay = delayLimit.FinishDelays[0];
-        for (uint256 i = 0; i < arrLength; i++) {
+        for (uint256 i = 1; i < arrLength; i++) {
             if (_amount >= delayLimit.Amounts[i]) {
                 _startDelay = delayLimit.StartDelays[i];
                 _cliffDelay = delayLimit.CliffDelays[i];
