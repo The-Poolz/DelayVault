@@ -33,7 +33,7 @@ contract DelayVault is DelayView {
             uint256 _startMinDelay,
             uint256 _cliffMinDelay,
             uint256 _finishMinDelay
-        ) = GetMinDelays(_token, _amount);
+        ) = GetMinDelays(_token, vault.Amount + _amount);
         {
             // Checking the minimum delay for each timing parameter.
             _checkMinDelay(_startDelay, _startMinDelay);
