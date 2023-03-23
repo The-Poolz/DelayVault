@@ -56,15 +56,15 @@ contract("DelayVault", (accounts) => {
         await instance.setMaxDelay(maxDelayLimit)
         await truffleAssert.reverts(
             instance.CreateVault(token.address, amount, week * 2, day, day),
-            "invalid timestamp"
+            "Delay greater than Allowed"
         )
         await truffleAssert.reverts(
             instance.CreateVault(token.address, amount, day, week * 2, day),
-            "invalid timestamp"
+            "Delay greater than Allowed"
         )
         await truffleAssert.reverts(
             instance.CreateVault(token.address, amount, day, day, week * 2),
-            "invalid timestamp"
+            "Delay greater than Allowed"
         )
         await truffleAssert.passes(instance.CreateVault(token.address, amount, week, week, week))
         await instance.Withdraw(token.address)

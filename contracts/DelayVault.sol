@@ -31,7 +31,7 @@ contract DelayVault is DelayView {
             _startDelay <= MaxDelay &&
                 _cliffDelay <= MaxDelay &&
                 _finishDelay <= MaxDelay,
-            "invalid timestamp"
+            "Delay greater than Allowed"
         );
         require( // for the possibility of increasing only the time parameters
             _amount > 0 ||
