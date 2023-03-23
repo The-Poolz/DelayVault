@@ -149,4 +149,33 @@ contract("DelayVault", (accounts) => {
         const vaultStatus = await instance.Allowance(token.address, accounts[1])
         assert.equal(vaultStatus, true)
     })
+
+    it("increase only timestamps", async () => {
+        // Create new vault
+        const token = await TestToken.new("TestToken", "TEST")
+        await token.approve(instance.address, amount)
+        await instance.swapTokenStatusFilter(token.address)
+        const startDelay = week
+        const cliffDelay = week
+        const finishDelay = week * 2
+        await instance.CreateVault(token.address, amount, startDelay, cliffDelay, finishDelay)
+        // can't set the same params
+        await truffleAssert.reverts(
+            instance.CreateVault(token.address, 0, startDelay, cliffDelay, finishDelay),
+            "amount should be greater than zero"
+        )
+        const newStartDelay = startDelay * 2
+        const newCliffDelay = cliffDelay * 2
+        const newFinishDelay = finishDelay * 2
+        // increase only startDelay
+        await truffleAssert.passes(instance.CreateVault(token.address, 0, newStartDelay, cliffDelay, finishDelay))
+        // increase only cliffDelay
+        await truffleAssert.passes(instance.CreateVault(token.address, 0, newStartDelay, newCliffDelay, finishDelay))
+        // increase only finishDelay
+        await truffleAssert.passes(instance.CreateVault(token.address, 0, newStartDelay, newCliffDelay, newFinishDelay))
+        const vaultMap = await instance.VaultMap(token.address, accounts[0])
+        assert.equal(vaultMap.StartDelay.toString(), newStartDelay.toString())
+        assert.equal(vaultMap.CliffDelay.toString(), newCliffDelay.toString())
+        assert.equal(vaultMap.FinishDelay.toString(), newFinishDelay.toString())
+    })
 })

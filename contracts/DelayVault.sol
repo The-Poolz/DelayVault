@@ -51,7 +51,7 @@ contract DelayVault is DelayView {
             _checkMinDelay(_cliffDelay, _cliffMinDelay);
             _checkMinDelay(_finishDelay, _finishMinDelay);
         }
-        TransferInToken(_token, msg.sender, _amount);
+        if (_amount > 0) TransferInToken(_token, msg.sender, _amount);
         vault.StartDelay = _startDelay;
         vault.CliffDelay = _cliffDelay;
         vault.FinishDelay = _finishDelay;
