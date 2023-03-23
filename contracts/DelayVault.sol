@@ -38,7 +38,7 @@ contract DelayVault is DelayView {
                 _startDelay > vault.StartDelay ||
                 _cliffDelay > vault.CliffDelay ||
                 _finishDelay > vault.FinishDelay,
-            "Invalid parameters: increase at least one value."
+            "Invalid parameters: increase at least one value"
         );
         (
             uint256 _startMinDelay,
