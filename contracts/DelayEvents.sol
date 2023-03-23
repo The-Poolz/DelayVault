@@ -23,4 +23,5 @@ contract DelayEvents {
         uint256 Amount,
         uint256 RemaningAmount
     );
+    event MaxDelayChanged(uint256 NewDelay, uint256 OldDelay);
 }

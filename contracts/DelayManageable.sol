@@ -17,7 +17,9 @@ contract DelayManageable is
     ERC20Helper,
     ReentrancyGuard
 {
-    function setLockedDealAddress(address _lockedDealAddress)
+    function setLockedDealAddress(
+        address _lockedDealAddress
+    )
         external
         onlyOwnerOrGov
         uniqueAddress(_lockedDealAddress, LockedDealAddress)
@@ -57,11 +59,18 @@ contract DelayManageable is
         );
     }
 
-    function swapTokenStatusFilter(address _token)
-        external
-        onlyOwnerOrGov
-        notZeroAddress(_token)
-    {
+    function setMaxDelay(
+        uint256 _maxDelay
+    ) external onlyOwnerOrGov uniqueValue(MaxDelay, _maxDelay) {
+        require(_maxDelay > 0, "max Delay can't be null");
+        uint256 oldDelay = MaxDelay;
+        MaxDelay = _maxDelay;
+        emit MaxDelayChanged(_maxDelay, oldDelay);
+    }
+
+    function swapTokenStatusFilter(
+        address _token
+    ) external onlyOwnerOrGov notZeroAddress(_token) {
         DelayLimit[_token].isActive = !DelayLimit[_token].isActive;
     }
 
