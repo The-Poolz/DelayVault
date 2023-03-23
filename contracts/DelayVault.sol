@@ -93,7 +93,14 @@ contract DelayVault is DelayView {
         } else {
             TransferToken(_token, msg.sender, lockAmount);
         }
-        emit VaultValueChanged(_token, msg.sender, 0, 0, 0, 0);
+        emit VaultValueChanged(
+            _token,
+            msg.sender,
+            vault.Amount,
+            vault.StartDelay,
+            vault.CliffDelay,
+            vault.FinishDelay
+        );
     }
 
     /// @dev the user can approve the redemption of their tokens by the admin
