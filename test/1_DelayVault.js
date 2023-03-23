@@ -48,6 +48,30 @@ contract("DelayVault", (accounts) => {
         )
     })
 
+    it("should revert invalid timestamp", async () => {
+        await instance.setMinDelays(token.address, amounts, startDelays, cliffDelays, finishDelays)
+        await token.approve(instance.address, amount)
+        const maxDelayLimit = 604800 // 1 week in seconds
+        const oldDelay = await instance.MaxDelay()
+        await instance.setMaxDelay(maxDelayLimit)
+        await truffleAssert.reverts(
+            instance.CreateVault(token.address, amount, week * 2, day, day),
+            "Delay greater than Allowed"
+        )
+        await truffleAssert.reverts(
+            instance.CreateVault(token.address, amount, day, week * 2, day),
+            "Delay greater than Allowed"
+        )
+        await truffleAssert.reverts(
+            instance.CreateVault(token.address, amount, day, day, week * 2),
+            "Delay greater than Allowed"
+        )
+        await truffleAssert.passes(instance.CreateVault(token.address, amount, week, week, week))
+        await instance.Withdraw(token.address)
+        // bring back the old delay
+        await instance.setMaxDelay(oldDelay)
+    })
+
     it("should create vault", async () => {
         await token.approve(instance.address, amount)
         let tx = await instance.CreateVault(token.address, amount, week, week, week * 2)

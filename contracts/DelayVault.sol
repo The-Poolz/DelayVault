@@ -7,6 +7,11 @@ import "./DelayView.sol";
 /// @title DelayVault core logic
 /// @author The-Poolz contract team
 contract DelayVault is DelayView {
+    constructor() {
+        // maxDelay are unlimited by default
+        MaxDelay = type(uint256).max;
+    }
+
     function CreateVault(
         address _token,
         uint256 _amount,
@@ -22,6 +27,12 @@ contract DelayVault is DelayView {
     {
         _shortDelay(_token, _startDelay, _cliffDelay, _finishDelay); // Stack Too deep error fixing
         Vault storage vault = VaultMap[_token][msg.sender];
+        require(
+            _startDelay <= MaxDelay &&
+                _cliffDelay <= MaxDelay &&
+                _finishDelay <= MaxDelay,
+            "Delay greater than Allowed"
+        );
         require( // for the possibility of increasing only the time parameters
             _amount > 0 ||
                 _startDelay > vault.StartDelay ||
@@ -59,11 +70,9 @@ contract DelayVault is DelayView {
     /** @dev Creates a new pool of tokens for a specified period or,
          if there is no Locked Deal address, sends tokens to the owner.
     */
-    function Withdraw(address _token)
-        external
-        nonReentrant
-        isVaultNotEmpty(_token, msg.sender)
-    {
+    function Withdraw(
+        address _token
+    ) external nonReentrant isVaultNotEmpty(_token, msg.sender) {
         Vault storage vault = VaultMap[_token][msg.sender];
         uint256 startDelay = block.timestamp + vault.StartDelay;
         uint256 finishDelay = startDelay + vault.FinishDelay;
