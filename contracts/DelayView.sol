@@ -5,24 +5,29 @@ import "./DelayManageable.sol";
 
 /// @title DelayView - getter view functions
 contract DelayView is DelayManageable {
-    function GetAllUsersData(address _token)
-        external
-        view
-        returns (address[] memory, Vault[] memory _vaults)
-    {
+    function GetAllUsersDataRange(
+        address _token,
+        uint256 _from,
+        uint256 _to
+    ) external view returns (address[] memory _users, Vault[] memory _vaults) {
+        require(_from <= _to, "_from index can't be greater than _to");
         _vaults = new Vault[](Users[_token].length);
-        for (uint256 i = 0; i < Users[_token].length; i++) {
+        _users = Users[_token];
+        for (uint256 i = _from; i <= _to; i++) {
             _vaults[i] = VaultMap[_token][Users[_token][i]];
         }
-        return (Users[_token], _vaults);
     }
 
-    function GetAllMyTokens(address _user)
-        external
-        view
-        returns (address[] memory)
-    {
-        return MyTokens[_user];
+    function GetAllMyTokensRange(
+        address _user,
+        uint256 _from,
+        uint256 _to
+    ) external view returns (address[] memory _tokens) {
+        require(_from <= _to, "_from index can't be greater than _to");
+        _tokens = new address[](MyTokens[_user].length);
+        for (uint256 i = _from; i <= _to; i++) {
+            _tokens[i] = MyTokens[_user][i];
+        }
     }
 
     function GetMyTokens(address _user)

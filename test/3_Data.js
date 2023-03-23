@@ -93,7 +93,9 @@ contract("Delay vault data", (accounts) => {
             await tokens[i].approve(instance.address, amount)
             await instance.CreateVault(tokens[i].address, amount, week, week, week)
         }
-        const allMyTokens = await instance.GetAllMyTokens(accounts[0])
+        const from = 0
+        const to = tokens.length - 1
+        const allMyTokens = await instance.GetAllMyTokensRange(accounts[0], from, to)
         const myTokens = await instance.GetMyTokens(accounts[0])
         assert.equal(allMyTokens.toString(), addresses.toString())
         assert.equal(myTokens.toString(), addresses.toString())
@@ -126,7 +128,9 @@ contract("Delay vault data", (accounts) => {
             await token.approve(instance.address, amount, { from: accounts[i] })
             await instance.CreateVault(token.address, amount, week, week, week, { from: accounts[i] })
         }
-        const data = await instance.GetAllUsersData(token.address)
+        const from = 0
+        const to = accounts.length - 1
+        const data = await instance.GetAllUsersDataRange(token.address, from, to)
         assert.equal(data[0].length, data[1].length)
         assert.equal(data[0].length, accounts.length)
         for (let i = 0; i < accounts.length; i++) {
