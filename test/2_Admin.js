@@ -54,12 +54,8 @@ contract("Delay vault admin settings", (accounts) => {
     it("should set max delay", async () => {
         const oldMaxDelay = await instance.MaxDelay()
         const maxDelay = 604800 // 1 week in seconds
-        const tx = await instance.setMaxDelay(maxDelay)
-        const oldTxDelay = tx.logs[0].args.OldDelay
-        const newTxDelay = tx.logs[0].args.NewDelay
+        await instance.setMaxDelay(maxDelay)
         const newMaxDelay = await instance.MaxDelay()
-        assert.equal(oldMaxDelay.toString(), oldTxDelay.toString())
-        assert.equal(newTxDelay.toString(), maxDelay.toString())
         assert.equal(newMaxDelay.toString(), maxDelay.toString())
         await truffleAssert.reverts(instance.setMaxDelay(maxDelay), "can't set the same value")
         await truffleAssert.reverts(instance.setMaxDelay("0"), "max Delay can't be null")

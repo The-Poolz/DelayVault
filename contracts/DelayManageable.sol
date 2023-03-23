@@ -63,9 +63,7 @@ contract DelayManageable is
         uint256 _maxDelay
     ) external onlyOwnerOrGov uniqueValue(MaxDelay, _maxDelay) {
         require(_maxDelay > 0, "max Delay can't be null");
-        uint256 oldDelay = MaxDelay;
         MaxDelay = _maxDelay;
-        emit MaxDelayChanged(_maxDelay, oldDelay);
     }
 
     function swapTokenStatusFilter(
