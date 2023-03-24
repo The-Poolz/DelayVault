@@ -30,7 +30,7 @@ contract DelayView is DelayManageable {
         view
         returns (address[] memory)
     {
-        address[] storage allTokens = MyTokens[_user];
+        address[] memory allTokens = MyTokens[_user];
         address[] memory tokens = new address[](allTokens.length);
         uint256 index;
         for (uint256 i = 0; i < allTokens.length; i++) {
