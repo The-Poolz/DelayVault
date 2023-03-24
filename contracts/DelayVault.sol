@@ -24,8 +24,8 @@ contract DelayVault is DelayView {
         nonReentrant
         notZeroAddress(_token)
         isTokenActive(_token)
+        validatetDelays(_token, _startDelay, _cliffDelay, _finishDelay)
     {
-        _shortDelay(_token, _startDelay, _cliffDelay, _finishDelay); // Stack Too deep error fixing
         Vault storage vault = VaultMap[_token][msg.sender];
         require(
             _startDelay <= MaxDelay &&
@@ -104,17 +104,5 @@ contract DelayVault is DelayView {
     /// @dev the user can approve the redemption of their tokens by the admin
     function SwapBuyBackStatus(address _token) external {
         Allowance[_token][msg.sender] = !Allowance[_token][msg.sender];
-    }
-
-    /// @dev the user can't set a time parameter less than the last one
-    function _shortDelay(
-        address _token,
-        uint256 _startDelay,
-        uint256 _cliffDelay,
-        uint256 _finishDelay
-    ) private view {
-        _shortStartDelay(_token, _startDelay);
-        _shortCliffDelay(_token, _cliffDelay);
-        _shortFinishDelay(_token, _finishDelay);
     }
 }

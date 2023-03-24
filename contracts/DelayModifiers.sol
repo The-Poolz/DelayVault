@@ -40,39 +40,31 @@ contract DelayModifiers is DelayData {
         _;
     }
 
-    modifier orderedArray(uint256[] memory _array) {
-        require(Array.isArrayOrdered(_array), "array should be ordered");
-        _;
-    }
-
-    function _shortStartDelay(
+    /// @dev the user can't set a time parameter less than the last one
+    modifier validatetDelays(
         address _token,
-        uint256 _startDelay
-    ) internal view {
+        uint256 _startDelay,
+        uint256 _cliffDelay,
+        uint256 _finishDelay
+    ) {
         require(
             _startDelay >= VaultMap[_token][msg.sender].StartDelay,
             "can't set a shorter start period than the last one"
         );
-    }
-
-    function _shortFinishDelay(
-        address _token,
-        uint256 _finishDelay
-    ) internal view {
-        require(
-            _finishDelay >= VaultMap[_token][msg.sender].FinishDelay,
-            "can't set a shorter finish period than the last one"
-        );
-    }
-
-    function _shortCliffDelay(
-        address _token,
-        uint256 _cliffDelay
-    ) internal view {
         require(
             _cliffDelay >= VaultMap[_token][msg.sender].CliffDelay,
             "can't set a shorter cliff period than the last one"
         );
+        require(
+            _finishDelay >= VaultMap[_token][msg.sender].FinishDelay,
+            "can't set a shorter finish period than the last one"
+        );
+        _;
+    }
+
+    modifier orderedArray(uint256[] memory _array) {
+        require(Array.isArrayOrdered(_array), "array should be ordered");
+        _;
     }
 
     function _notZeroAddress(address _addr) private pure {
