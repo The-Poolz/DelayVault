@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity 0.8.19;
 
 import "poolz-helper-v2/contracts/interfaces/ILockedDealV2.sol";
 import "./DelayView.sol";
