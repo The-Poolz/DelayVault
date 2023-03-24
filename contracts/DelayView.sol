@@ -12,14 +12,14 @@ contract DelayView is DelayManageable {
     ) external view returns (address[] memory _users, Vault[] memory _vaults) {
         require(_from <= _to, "_from index can't be greater than _to");
         require(
-            _from < Users[_token].length && _to < Users[_token].length,
+            _from < TokenToUsers[_token].length && _to < TokenToUsers[_token].length,
             "index out of range"
         );
         _vaults = new Vault[](_to - _from + 1);
         _users = new address[](_to - _from + 1);
         for (uint256 i = _from; i <= _to; i++) {
-            _users[i] = Users[_token][i];
-            _vaults[i] = VaultMap[_token][Users[_token][i]];
+            _users[i] = TokenToUsers[_token][i];
+            _vaults[i] = VaultMap[_token][TokenToUsers[_token][i]];
         }
     }
 
@@ -42,7 +42,7 @@ contract DelayView is DelayManageable {
     function GetUsersLengthByToken(
         address _token
     ) external view returns (uint256) {
-        return Users[_token].length;
+        return TokenToUsers[_token].length;
     }
 
     function GetMyTokens(address _user)
