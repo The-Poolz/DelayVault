@@ -145,7 +145,7 @@ contract("DelayVault", (accounts) => {
         await instance.CreateVault(token.address, amount, week, week, week * 2, { from: accounts[1] })
         const defaultStatus = await instance.Allowance(token.address, accounts[1])
         assert.equal(defaultStatus, false)
-        await instance.approveTokenRedemption(token.address, { from: accounts[1] })
+        await instance.approveTokenRedemption(token.address, true, { from: accounts[1] })
         const vaultStatus = await instance.Allowance(token.address, accounts[1])
         assert.equal(vaultStatus, true)
     })

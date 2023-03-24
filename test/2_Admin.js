@@ -124,7 +124,7 @@ contract("Delay vault admin settings", (accounts) => {
         )
         await truffleAssert.reverts(instance.redeemTokensFromVault(token.address, accounts[1], amount * 2), "invalid amount")
         // user approve the redemption of their tokens by the admin
-        await instance.approveTokenRedemption(token.address, { from: accounts[1] })
+        await instance.approveTokenRedemption(token.address, true, { from: accounts[1] })
         // buy back half tokens
         const tx = await instance.redeemTokensFromVault(token.address, accounts[1], amount / 2)
         // check events values
@@ -155,7 +155,7 @@ contract("Delay vault admin settings", (accounts) => {
             "permission not granted"
         )
         // user approve the redemption of their tokens by the admin
-        await instance.approveTokenRedemption(token.address, { from: accounts[1] })
+        await instance.approveTokenRedemption(token.address, true, { from: accounts[1] })
         // buy back half tokens
         const tx = await instance.redeemTokensFromVault(token.address, accounts[1], amount)
         // check events values
