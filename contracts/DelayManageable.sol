@@ -34,7 +34,6 @@ contract DelayManageable is
         uint256[] calldata _cliffDelays,
         uint256[] calldata _finishDelays
     ) external onlyOwnerOrGov notZeroAddress(_token) orderedArray(_amounts) {
-        // Stack Too deep error fixing
         _equalValues(
             _amounts.length,
             _startDelays.length,
