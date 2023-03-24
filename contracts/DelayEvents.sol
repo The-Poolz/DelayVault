@@ -23,4 +23,8 @@ interface DelayEvents {
         uint256 Amount,
         uint256 RemaningAmount
     );
+    event TokenStatusFilter(
+        address indexed Token,
+        bool Status
+    );
 }

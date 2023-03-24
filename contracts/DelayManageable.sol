@@ -67,6 +67,7 @@ contract DelayManageable is
         address _token
     ) external onlyOwnerOrGov notZeroAddress(_token) {
         DelayLimit[_token].isActive = !DelayLimit[_token].isActive;
+        emit TokenStatusFilter(_token, DelayLimit[_token].isActive);
     }
 
     function Pause() external onlyOwnerOrGov {
