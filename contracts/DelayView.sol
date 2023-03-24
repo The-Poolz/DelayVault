@@ -60,9 +60,21 @@ contract DelayView is DelayManageable {
     }
 
     function GetMinDelays(address _token, uint256 _amount)
-        public
+        external
         view
         isTokenActive(_token)
+        returns (
+            uint256 _startDelay,
+            uint256 _cliffDelay,
+            uint256 _finishDelay
+        )
+    {
+           return _getMinDelays(_token, _amount);
+    }
+
+    function _getMinDelays(address _token, uint256 _amount)
+        internal
+        view      
         returns (
             uint256 _startDelay,
             uint256 _cliffDelay,
