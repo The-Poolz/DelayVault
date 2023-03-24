@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity 0.8.19;
 
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "poolz-helper-v2/contracts/GovManager.sol";
@@ -34,15 +34,12 @@ contract DelayManageable is
         uint256[] calldata _cliffDelays,
         uint256[] calldata _finishDelays
     ) external onlyOwnerOrGov notZeroAddress(_token) orderedArray(_amounts) {
-        {
-            // Stack Too deep error fixing
-            _equalValues(
-                _amounts.length,
-                _startDelays.length,
-                _cliffDelays.length,
-                _finishDelays.length
-            );
-        }
+        _equalValues(
+            _amounts.length,
+            _startDelays.length,
+            _cliffDelays.length,
+            _finishDelays.length
+        );
         DelayLimit[_token] = Delay(
             _amounts,
             _startDelays,
@@ -70,6 +67,7 @@ contract DelayManageable is
         address _token
     ) external onlyOwnerOrGov notZeroAddress(_token) {
         DelayLimit[_token].isActive = !DelayLimit[_token].isActive;
+        emit TokenStatusFilter(_token, DelayLimit[_token].isActive);
     }
 
     function Pause() external onlyOwnerOrGov {
