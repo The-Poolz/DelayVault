@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity 0.8.19;
 
 /// @title contains all events.
-contract DelayEvents {
+interface DelayEvents {
     event VaultValueChanged(
         address indexed Token,
         address indexed Owner,
@@ -22,5 +22,9 @@ contract DelayEvents {
         address indexed Token,
         uint256 Amount,
         uint256 RemaningAmount
+    );
+    event TokenStatusFilter(
+        address indexed Token,
+        bool Status
     );
 }

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity 0.8.19;
 
 import "./DelayManageable.sol";
 
@@ -50,7 +50,7 @@ contract DelayView is DelayManageable {
         view
         returns (address[] memory)
     {
-        address[] storage allTokens = MyTokens[_user];
+        address[] memory allTokens = MyTokens[_user];
         address[] memory tokens = new address[](allTokens.length);
         uint256 index;
         for (uint256 i = 0; i < allTokens.length; i++) {
@@ -80,9 +80,21 @@ contract DelayView is DelayManageable {
     }
 
     function GetMinDelays(address _token, uint256 _amount)
-        public
+        external
         view
         isTokenActive(_token)
+        returns (
+            uint256 _startDelay,
+            uint256 _cliffDelay,
+            uint256 _finishDelay
+        )
+    {
+           return _getMinDelays(_token, _amount);
+    }
+
+    function _getMinDelays(address _token, uint256 _amount)
+        internal
+        view      
         returns (
             uint256 _startDelay,
             uint256 _cliffDelay,
