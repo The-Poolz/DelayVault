@@ -25,40 +25,43 @@ contract DelayVault is DelayView {
         notZeroAddress(_token)
         isTokenActive(_token)
     {
-        _shortDelay(_token, _startDelay, _cliffDelay, _finishDelay); // Stack Too deep error fixing
-        Vault storage vault = VaultMap[_token][msg.sender];
         require(
             _startDelay <= MaxDelay &&
                 _cliffDelay <= MaxDelay &&
                 _finishDelay <= MaxDelay,
             "Delay greater than Allowed"
         );
-        require( // for the possibility of increasing only the time parameters
+        require(
             _amount > 0 ||
-                _startDelay > vault.StartDelay ||
-                _cliffDelay > vault.CliffDelay ||
-                _finishDelay > vault.FinishDelay,
+                _startDelay > VaultMap[_token][msg.sender].StartDelay ||
+                _cliffDelay > VaultMap[_token][msg.sender].CliffDelay ||
+                _finishDelay > VaultMap[_token][msg.sender].FinishDelay,
             "Invalid parameters: increase at least one value"
         );
         (
             uint256 _startMinDelay,
             uint256 _cliffMinDelay,
             uint256 _finishMinDelay
-        ) = GetMinDelays(_token, vault.Amount + _amount);
-        // Checking the minimum delay for each timing parameter.
+        ) = GetMinDelays(_token, VaultMap[_token][msg.sender].Amount + _amount);
         _checkMinDelay(_startDelay, _startMinDelay);
         _checkMinDelay(_cliffDelay, _cliffMinDelay);
         _checkMinDelay(_finishDelay, _finishMinDelay);
-        if (_amount > 0) TransferInToken(_token, msg.sender, _amount);
+
+        Vault storage vault = VaultMap[_token][msg.sender];
+        if (_amount > 0) {
+            TransferInToken(_token, msg.sender, _amount);
+            vault.Amount += _amount;
+        }
         vault.StartDelay = _startDelay;
         vault.CliffDelay = _cliffDelay;
         vault.FinishDelay = _finishDelay;
         Array.addIfNotExsist(Users[_token], msg.sender);
         Array.addIfNotExsist(MyTokens[msg.sender], _token);
+
         emit VaultValueChanged(
             _token,
             msg.sender,
-            vault.Amount += _amount,
+            vault.Amount,
             _startDelay,
             _cliffDelay,
             _finishDelay
