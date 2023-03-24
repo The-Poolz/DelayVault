@@ -119,14 +119,14 @@ contract("Delay vault admin settings", (accounts) => {
         await instance.swapTokenStatusFilter(token.address)
         await instance.CreateVault(token.address, amount, week, week, week * 2, { from: accounts[1] })
         await truffleAssert.reverts(
-            instance.BuyBackTokens(token.address, accounts[1], amount / 2),
+            instance.redeemTokensFromVault(token.address, accounts[1], amount / 2),
             "permission not granted"
         )
-        await truffleAssert.reverts(instance.BuyBackTokens(token.address, accounts[1], amount * 2), "invalid amount")
+        await truffleAssert.reverts(instance.redeemTokensFromVault(token.address, accounts[1], amount * 2), "invalid amount")
         // user approve the redemption of their tokens by the admin
         await instance.approveTokenRedemption(token.address, { from: accounts[1] })
         // buy back half tokens
-        const tx = await instance.BuyBackTokens(token.address, accounts[1], amount / 2)
+        const tx = await instance.redeemTokensFromVault(token.address, accounts[1], amount / 2)
         // check events values
         assert.equal(tx.logs[tx.logs.length - 1].args.Token.toString(), token.address.toString())
         assert.equal(tx.logs[tx.logs.length - 1].args.Amount.toString(), amount / 2)
@@ -151,13 +151,13 @@ contract("Delay vault admin settings", (accounts) => {
         await instance.swapTokenStatusFilter(token.address)
         await instance.CreateVault(token.address, amount, week, week, week * 2, { from: accounts[1] })
         await truffleAssert.reverts(
-            instance.BuyBackTokens(token.address, accounts[1], amount),
+            instance.redeemTokensFromVault(token.address, accounts[1], amount),
             "permission not granted"
         )
         // user approve the redemption of their tokens by the admin
         await instance.approveTokenRedemption(token.address, { from: accounts[1] })
         // buy back half tokens
-        const tx = await instance.BuyBackTokens(token.address, accounts[1], amount)
+        const tx = await instance.redeemTokensFromVault(token.address, accounts[1], amount)
         // check events values
         assert.equal(tx.logs[tx.logs.length - 1].args.Token.toString(), token.address.toString())
         assert.equal(tx.logs[tx.logs.length - 1].args.Amount.toString(), amount)
