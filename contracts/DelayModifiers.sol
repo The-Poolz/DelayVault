@@ -41,7 +41,7 @@ contract DelayModifiers is DelayData {
     }
 
     /// @dev the user can't set a time parameter less than the last one
-    modifier validatetDelays(
+    modifier validateDelays(
         address _token,
         uint256 _startDelay,
         uint256 _cliffDelay,

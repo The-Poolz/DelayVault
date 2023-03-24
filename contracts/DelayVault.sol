@@ -24,7 +24,7 @@ contract DelayVault is DelayView {
         nonReentrant
         notZeroAddress(_token)
         isTokenActive(_token)
-        validatetDelays(_token, _startDelay, _cliffDelay, _finishDelay)
+        validateDelays(_token, _startDelay, _cliffDelay, _finishDelay)
     {
         Vault storage vault = VaultMap[_token][msg.sender];
         require(
