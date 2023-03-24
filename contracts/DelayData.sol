@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity 0.8.19;
 
 /// @title contain stores variables.
 contract DelayData {
@@ -8,7 +8,7 @@ contract DelayData {
     mapping(address => mapping(address => Vault)) public VaultMap;
     mapping(address => mapping(address => bool)) public Allowance;
     mapping(address => address[]) public MyTokens;
-    mapping(address => address[]) public Users;
+    mapping(address => address[]) public TokenToUsers;
     uint256 public MaxDelay;
 
     struct Vault {

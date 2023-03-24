@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity 0.8.19;
 
 import "poolz-helper-v2/contracts/interfaces/ILockedDealV2.sol";
 import "./DelayView.sol";
@@ -44,7 +44,7 @@ contract DelayVault is DelayView {
             uint256 _startMinDelay,
             uint256 _cliffMinDelay,
             uint256 _finishMinDelay
-        ) = GetMinDelays(_token, vault.Amount + _amount);
+        ) = _getMinDelays(_token, vault.Amount + _amount);
         // Checking the minimum delay for each timing parameter.
         _checkMinDelay(_startDelay, _startMinDelay);
         _checkMinDelay(_cliffDelay, _cliffMinDelay);
@@ -53,7 +53,7 @@ contract DelayVault is DelayView {
         vault.StartDelay = _startDelay;
         vault.CliffDelay = _cliffDelay;
         vault.FinishDelay = _finishDelay;
-        Array.addIfNotExsist(Users[_token], msg.sender);
+        Array.addIfNotExsist(TokenToUsers[_token], msg.sender);
         Array.addIfNotExsist(MyTokens[msg.sender], _token);
         emit VaultValueChanged(
             _token,
