@@ -53,7 +53,7 @@ contract DelayVault is DelayView {
         vault.StartDelay = _startDelay;
         vault.CliffDelay = _cliffDelay;
         vault.FinishDelay = _finishDelay;
-        Array.addIfNotExsist(Users[_token], msg.sender);
+        Array.addIfNotExsist(TokenToUsers[_token], msg.sender);
         Array.addIfNotExsist(MyTokens[msg.sender], _token);
         emit VaultValueChanged(
             _token,
