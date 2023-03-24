@@ -5,7 +5,7 @@ import "./DelayManageable.sol";
 
 /// @title DelayView - getter view functions
 contract DelayView is DelayManageable {
-    function GetAllUsersDataRange(
+    function GetUsersDataByRange(
         address _token,
         uint256 _from,
         uint256 _to
@@ -16,13 +16,14 @@ contract DelayView is DelayManageable {
             "index out of range"
         );
         _vaults = new Vault[](_to - _from + 1);
-        _users = Users[_token];
+        _users = new address[](_to - _from + 1);
         for (uint256 i = _from; i <= _to; i++) {
+            _users[i] = Users[_token][i];
             _vaults[i] = VaultMap[_token][Users[_token][i]];
         }
     }
 
-    function GetAllMyTokensRange(
+    function GetMyTokensByRange(
         address _user,
         uint256 _from,
         uint256 _to
@@ -36,6 +37,12 @@ contract DelayView is DelayManageable {
         for (uint256 i = _from; i <= _to; i++) {
             _tokens[i] = MyTokens[_user][i];
         }
+    }
+
+    function GetUsersLengthByToken(
+        address _token
+    ) external view returns (uint256) {
+        return Users[_token].length;
     }
 
     function GetMyTokens(address _user)

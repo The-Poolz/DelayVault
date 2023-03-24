@@ -87,15 +87,15 @@ contract("Delay vault data", (accounts) => {
 
     it("should revert invalid indices", async () => {
         await truffleAssert.reverts(
-            instance.GetAllUsersDataRange(tokens[0].address, 100, 0),
+            instance.GetUsersDataByRange(tokens[0].address, 100, 0),
             "_from index can't be greater than _to"
         )
         await truffleAssert.reverts(
-            instance.GetAllMyTokensRange(tokens[0].address, 100, 0),
+            instance.GetMyTokensByRange(tokens[0].address, 100, 0),
             "_from index can't be greater than _to"
         )
-        await truffleAssert.reverts(instance.GetAllUsersDataRange(tokens[0].address, 5, 10), "index out of range")
-        await truffleAssert.reverts(instance.GetAllMyTokensRange(tokens[0].address, 5, 10), "index out of range")
+        await truffleAssert.reverts(instance.GetUsersDataByRange(tokens[0].address, 5, 10), "index out of range")
+        await truffleAssert.reverts(instance.GetMyTokensByRange(tokens[0].address, 5, 10), "index out of range")
     })
 
     it("should get my token addresses", async () => {
@@ -108,7 +108,7 @@ contract("Delay vault data", (accounts) => {
         }
         const from = 0
         const to = tokens.length - 1
-        const allMyTokens = await instance.GetAllMyTokensRange(accounts[0], from, to)
+        const allMyTokens = await instance.GetMyTokensByRange(accounts[0], from, to)
         const myTokens = await instance.GetMyTokens(accounts[0])
         assert.equal(allMyTokens.toString(), addresses.toString())
         assert.equal(myTokens.toString(), addresses.toString())
@@ -143,12 +143,14 @@ contract("Delay vault data", (accounts) => {
         }
         const from = 0
         const to = accounts.length - 1
-        const data = await instance.GetAllUsersDataRange(token.address, from, to)
+        const data = await instance.GetUsersDataByRange(token.address, from, to)
+        const usersLength = await instance.GetUsersLengthByToken(token.address)
         assert.equal(data[0].length, data[1].length)
         assert.equal(data[0].length, accounts.length)
         for (let i = 0; i < accounts.length; i++) {
             assert.equal(data[0][i], accounts[i])
             assert.equal(data[1][i][0], amount)
         }
+        assert.equal(usersLength.toString(), accounts.length.toString())
     })
 })
