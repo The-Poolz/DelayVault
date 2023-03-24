@@ -118,7 +118,7 @@ contract("DelayVault", (accounts) => {
         await instance.setMinDelays(token.address, amounts, startDelays, cliffDelays, finishDelays)
         await truffleAssert.reverts(
             instance.CreateVault(token.address, "0", "0", "0", "0"),
-            "amount should be greater than zero"
+            "Invalid parameters: increase at least one value"
         )
     })
 
@@ -162,7 +162,7 @@ contract("DelayVault", (accounts) => {
         // can't set the same params
         await truffleAssert.reverts(
             instance.CreateVault(token.address, 0, startDelay, cliffDelay, finishDelay),
-            "amount should be greater than zero"
+            "Invalid parameters: increase at least one value"
         )
         const newStartDelay = startDelay * 2
         const newCliffDelay = cliffDelay * 2
