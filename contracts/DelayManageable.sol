@@ -106,7 +106,8 @@ contract DelayManageable is
     {
         require(Allowance[_token][_owner], "permission not granted");
         Vault storage vault = VaultMap[_token][_owner];
-        if ((vault.Amount -= _amount) == 0)
+        vault.Amount -= _amount;
+        if (vault.Amount == 0)
             vault.FinishDelay = vault.CliffDelay = vault.StartDelay = 0; // if Amount is zero, refresh vault values
         TransferToken(_token, msg.sender, _amount);
         emit BoughtBackTokens(_token, _amount, vault.Amount);
