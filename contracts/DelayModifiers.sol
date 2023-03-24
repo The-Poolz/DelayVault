@@ -47,6 +47,7 @@ contract DelayModifiers is DelayData {
         uint256 _cliffDelay,
         uint256 _finishDelay
     ) {
+        {
         require(
             _startDelay >= VaultMap[_token][msg.sender].StartDelay,
             "can't set a shorter start period than the last one"
@@ -59,6 +60,7 @@ contract DelayModifiers is DelayData {
             _finishDelay >= VaultMap[_token][msg.sender].FinishDelay,
             "can't set a shorter finish period than the last one"
         );
+        }
         _;
     }
 
