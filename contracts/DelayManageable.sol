@@ -89,7 +89,7 @@ contract DelayManageable is
     }
 
     /// @dev redemption of approved ERC-20 tokens from the contract
-    function BuyBackTokens(
+    function redeemTokensFromVault(
         address _token,
         address _owner,
         uint256 _amount
@@ -106,6 +106,6 @@ contract DelayManageable is
         if ((vault.Amount -= _amount) == 0)
             vault.FinishDelay = vault.CliffDelay = vault.StartDelay = 0; // if Amount is zero, refresh vault values
         TransferToken(_token, msg.sender, _amount);
-        emit BoughtBackTokens(_token, _amount, vault.Amount);
+        emit RedeemedTokens(_token, _amount, vault.Amount);
     }
 }

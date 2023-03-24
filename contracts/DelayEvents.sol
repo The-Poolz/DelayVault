@@ -18,7 +18,12 @@ contract DelayEvents {
         uint256[] CliffDelays,
         uint256[] FinishDelays
     );
-    event BoughtBackTokens(
+    event TokenRedemptionApproval(
+        address indexed token,
+        address indexed user,
+        bool status
+    );
+    event RedeemedTokens(
         address indexed Token,
         uint256 Amount,
         uint256 RemaningAmount

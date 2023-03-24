@@ -102,8 +102,9 @@ contract DelayVault is DelayView {
     }
 
     /// @dev the user can approve the redemption of their tokens by the admin
-    function SwapBuyBackStatus(address _token) external {
-        Allowance[_token][msg.sender] = !Allowance[_token][msg.sender];
+    function approveTokenRedemption(address _token, bool _status) external {
+        Allowance[_token][msg.sender] = _status;
+        emit TokenRedemptionApproval(_token, msg.sender, _status);
     }
 
     /// @dev the user can't set a time parameter less than the last one
