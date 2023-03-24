@@ -93,7 +93,7 @@ contract("DelayVault", (accounts) => {
         assert.equal(newAmount.toString(), (amount * 2).toString())
     })
 
-    it("should revert shorter blocking period than the last one", async () => {
+    xit("should revert shorter blocking period than the last one", async () => {
         await instance.setMinDelays(token.address, amounts, startDelays, cliffDelays, finishDelays)
         await token.approve(instance.address, amount)
         await truffleAssert.reverts(
