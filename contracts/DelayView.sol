@@ -12,7 +12,7 @@ contract DelayView is DelayManageable {
     ) external view returns (address[] memory _users, Vault[] memory _vaults) {
         require(_from <= _to, "_from index can't be greater than _to");
         require(
-            _from < Users[_token].length || _to < Users[_token].length,
+            _from < Users[_token].length && _to < Users[_token].length,
             "index out of range"
         );
         _vaults = new Vault[](_to - _from + 1);
@@ -29,7 +29,7 @@ contract DelayView is DelayManageable {
     ) external view returns (address[] memory _tokens) {
         require(_from <= _to, "_from index can't be greater than _to");
         require(
-            _from < MyTokens[_user].length || _to < MyTokens[_user].length,
+            _from < MyTokens[_user].length && _to < MyTokens[_user].length,
             "index out of range"
         );
         _tokens = new address[](_to - _from + 1);
