@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity 0.8.19;
 
 import "./DelayManageable.sol";
 
@@ -10,11 +10,11 @@ contract DelayView is DelayManageable {
         view
         returns (address[] memory, Vault[] memory _vaults)
     {
-        _vaults = new Vault[](Users[_token].length);
-        for (uint256 i = 0; i < Users[_token].length; i++) {
-            _vaults[i] = VaultMap[_token][Users[_token][i]];
+        _vaults = new Vault[](TokenToUsers[_token].length);
+        for (uint256 i = 0; i < TokenToUsers[_token].length; i++) {
+            _vaults[i] = VaultMap[_token][TokenToUsers[_token][i]];
         }
-        return (Users[_token], _vaults);
+        return (TokenToUsers[_token], _vaults);
     }
 
     function GetAllMyTokens(address _user)
