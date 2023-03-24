@@ -109,9 +109,11 @@ contract("Delay vault data", (accounts) => {
         const from = 0
         const to = tokens.length - 1
         const allMyTokens = await instance.GetMyTokensByRange(accounts[0], from, to)
+        const tokenLength = await instance.GetMyTokensLengthByUser(accounts[0])
         const myTokens = await instance.GetMyTokens(accounts[0])
         assert.equal(allMyTokens.toString(), addresses.toString())
         assert.equal(myTokens.toString(), addresses.toString())
+        assert.equal(tokenLength, tokens.length)
     })
 
     it("check my token duplicate", async () => {
