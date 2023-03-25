@@ -63,11 +63,12 @@ contract DelayManageable is
         MaxDelay = _maxDelay;
     }
 
-    function swapTokenStatusFilter(
-        address _token
+    function setTokenStatusFilter(
+        address _token,
+        bool _status
     ) external onlyOwnerOrGov notZeroAddress(_token) {
-        DelayLimit[_token].isActive = !DelayLimit[_token].isActive;
-        emit TokenStatusFilter(_token, DelayLimit[_token].isActive);
+        DelayLimit[_token].isActive = _status;
+        emit TokenStatusFilter(_token, _status);
     }
 
     function Pause() external onlyOwnerOrGov {
