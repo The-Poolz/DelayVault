@@ -45,7 +45,7 @@ contract DelayModifiers is DelayData {
         _;
     }
 
-    function _DelayValidator(
+function _DelayValidator(
         address _token,
         uint256 _amount,
         uint256 _startDelay,
@@ -53,49 +53,23 @@ contract DelayModifiers is DelayData {
         uint256 _finishDelay,
         Vault storage _vault
     ) internal view {
-        // Ensure that the new start delay is greater than or equal to the previous start delay
-        require(
-            _startDelay >= _vault.StartDelay,
-            "start delay less than previous start delay"
-        );
-
-        // Ensure that the new cliff delay is greater than or equal to the previous cliff delay
-        require(
-            _cliffDelay >= _vault.CliffDelay,
-            "cliff delay less than previous cliff delay"
-        );
-
-        // Ensure that the new finish delay is greater than or equal to the previous finish delay
-        require(
-            _finishDelay >= _vault.FinishDelay,
-            "finish delay less than previous finish delay"
-        );
-
-        // Get the minimum delays based on the new amount
         (
             uint256 _startMinDelay,
             uint256 _cliffMinDelay,
             uint256 _finishMinDelay
         ) = _getMinDelays(_token, _vault.Amount + _amount);
 
-        // Ensure that the new start delay is greater than or equal to the minimum start delay
         require(
-            _startDelay >= _startMinDelay,
-            "start delay less than minimum start delay"
-        );
-
-        // Ensure that the new cliff delay is greater than or equal to the minimum cliff delay
-        require(
-            _cliffDelay >= _cliffMinDelay,
-            "cliff delay less than minimum cliff delay"
-        );
-
-        // Ensure that the new finish delay is greater than or equal to the minimum finish delay
-        require(
+            _startDelay >= _vault.StartDelay &&
+            _cliffDelay >= _vault.CliffDelay &&
+            _finishDelay >= _vault.FinishDelay &&
+            _startDelay >= _startMinDelay &&
+            _cliffDelay >= _cliffMinDelay &&
             _finishDelay >= _finishMinDelay,
-            "finish delay less than minimum finish delay"
+            "Invalid delay parameters"
         );
     }
+
 
     function _notZeroAddress(address _addr) private pure {
         require(_addr != address(0), "address can't be null");
