@@ -3,6 +3,7 @@ const truffleAssert = require("truffle-assertions")
 const TestToken = artifacts.require("ERC20Token")
 
 const { assert } = require("chai")
+const { ZERO_ADDRESS } = require("@openzeppelin/test-helpers/src/constants")
 
 contract("Delay vault data", (accounts) => {
     let instance,
@@ -155,4 +156,9 @@ contract("Delay vault data", (accounts) => {
         }
         assert.equal(usersLength.toString(), accounts.length.toString())
     })
+    it("should return the correct checksum", async () => {
+        const expectedChecksum = web3.utils.soliditySha3(accounts[0], ZERO_ADDRESS);
+        const actualChecksum = await instance.getChecksum();
+        assert.equal(actualChecksum, expectedChecksum);
+      });      
 })

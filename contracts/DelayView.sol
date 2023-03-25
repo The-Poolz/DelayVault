@@ -87,4 +87,8 @@ contract DelayView is DelayManageable {
     function GetTokenFilterStatus(address _token) external view returns (bool) {
         return DelayLimit[_token].isActive;
     }
+
+    function getChecksum() public view returns (bytes32) {
+        return keccak256(abi.encodePacked(owner(), GovernorContract));
+    }
 }
