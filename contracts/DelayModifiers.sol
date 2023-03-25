@@ -45,7 +45,6 @@ contract DelayModifiers is DelayData {
         _;
     }
 
-    /// @dev the user can't set a time parameter less than the last one
     function _DelayValidator(
         address _token,
         uint256 _amount,
@@ -54,27 +53,48 @@ contract DelayModifiers is DelayData {
         uint256 _finishDelay,
         Vault storage _vault
     ) internal view {
+        // Ensure that the new start delay is greater than or equal to the previous start delay
         require(
             _startDelay >= _vault.StartDelay,
-            "can't set a shorter start period than the last one"
+            "start delay less than previous start delay"
         );
+
+        // Ensure that the new cliff delay is greater than or equal to the previous cliff delay
         require(
             _cliffDelay >= _vault.CliffDelay,
-            "can't set a shorter cliff period than the last one"
+            "cliff delay less than previous cliff delay"
         );
+
+        // Ensure that the new finish delay is greater than or equal to the previous finish delay
         require(
             _finishDelay >= _vault.FinishDelay,
-            "can't set a shorter finish period than the last one"
+            "finish delay less than previous finish delay"
         );
+
+        // Get the minimum delays based on the new amount
         (
             uint256 _startMinDelay,
             uint256 _cliffMinDelay,
             uint256 _finishMinDelay
         ) = _getMinDelays(_token, _vault.Amount + _amount);
-        // Checking the minimum delay for each timing parameter.
-        _checkMinDelay(_startDelay, _startMinDelay);
-        _checkMinDelay(_cliffDelay, _cliffMinDelay);
-        _checkMinDelay(_finishDelay, _finishMinDelay);
+
+        // Ensure that the new start delay is greater than or equal to the minimum start delay
+        require(
+            _startDelay >= _startMinDelay,
+            "start delay less than minimum start delay"
+        );
+
+        // Ensure that the new cliff delay is greater than or equal to the minimum cliff delay
+        require(
+            _cliffDelay >= _cliffMinDelay,
+            "cliff delay less than minimum cliff delay"
+        );
+
+        // Ensure that the new finish delay is greater than or equal to the minimum finish delay
+        require(
+            _finishDelay >= _finishMinDelay,
+            "finish delay less than minimum finish delay"
+        );
     }
 
     function _notZeroAddress(address _addr) private pure {
@@ -83,9 +103,5 @@ contract DelayModifiers is DelayData {
 
     function _equalValue(uint256 _fLength, uint256 _sLength) internal pure {
         require(_fLength == _sLength, "invalid array length");
-    }
-
-    function _checkMinDelay(uint256 _delay, uint256 _minDelay) internal pure {
-        require(_delay >= _minDelay, "delay less than min delay");
     }
 }

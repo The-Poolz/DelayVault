@@ -36,18 +36,17 @@ contract DelayData {
     {
         Delay memory delayLimit = DelayLimit[_token];
         uint256 arrLength = delayLimit.Amounts.length;
-        if (arrLength == 0 || delayLimit.Amounts[0] > _amount) return (0, 0, 0);
-        _startDelay = delayLimit.StartDelays[0];
-        _cliffDelay = delayLimit.CliffDelays[0];
-        _finishDelay = delayLimit.FinishDelays[0];
-        for (uint256 i = 1; i < arrLength; i++) {
-            if (_amount >= delayLimit.Amounts[i]) {
-                _startDelay = delayLimit.StartDelays[i];
-                _cliffDelay = delayLimit.CliffDelays[i];
-                _finishDelay = delayLimit.FinishDelays[i];
-            } else {
+        if (arrLength == 0 || delayLimit.Amounts[0] > _amount) {
+            return (0, 0, 0);
+        }
+        uint256 i;
+        for (i = 1; i < arrLength; i++) {
+            if (_amount < delayLimit.Amounts[i]) {
                 break;
             }
         }
+        return (delayLimit.StartDelays[i - 1],
+                delayLimit.CliffDelays[i - 1],
+                delayLimit.FinishDelays[i - 1]);
     }
 }
