@@ -122,6 +122,6 @@ contract DelayView is DelayManageable {
     }
 
     function getChecksum() public view returns (bytes32) {
-        return keccak256(abi.encodePacked(owner(), GovernerContract));
+        return keccak256(abi.encodePacked(owner(), GovernorContract));
     }
 }
