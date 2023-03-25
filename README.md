@@ -62,7 +62,7 @@ https://github.com/The-Poolz/DelayVault/blob/a76a1825297a9126120ba47a83305f0a128
 - **_token** - which token do you want to withdraw.
 
 ## Swap Buy Back Status 
-By default, the admin can't purchase user tokens. Withdrawal rights are defined by the user using the `SwapBuyBackStatus` function. If the user changes his mind about allowing the administrator to redeem tokens from the vault, he must repeat the function call.
+By default, the admin can't purchase user tokens. Withdrawal rights are defined by the user using the `approveTokenRedemption` function. If the user changes his mind about allowing the administrator to redeem tokens from the vault, he must repeat the function call.
 https://github.com/The-Poolz/DelayVault/blob/03490e948a05f6556d0571e8781547ec42387ed1/contracts/DelayVault.sol#L91-L92
 - **_token** - which token will be approved for redemption.
 

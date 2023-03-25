@@ -128,7 +128,7 @@ contract("DelayVault", (accounts) => {
         await instance.setLockedDealAddress(constants.ZERO_ADDRESS)
         await token.transfer(owner, amount)
         await token.approve(instance.address, amount, { from: owner })
-        await instance.swapTokenStatusFilter(token.address)
+        await instance.setTokenStatusFilter(token.address, true)
         await instance.CreateVault(token.address, amount, week, week, week, { from: owner })
         const oldOwnerBalance = await token.balanceOf(owner)
         assert.equal(oldOwnerBalance.toString(), 0)
@@ -141,11 +141,11 @@ contract("DelayVault", (accounts) => {
     it("swap approve status", async () => {
         const token = await TestToken.new("TestToken", "TEST", { from: accounts[1] })
         await token.approve(instance.address, amount, { from: accounts[1] })
-        await instance.swapTokenStatusFilter(token.address)
+        await instance.setTokenStatusFilter(token.address, true)
         await instance.CreateVault(token.address, amount, week, week, week * 2, { from: accounts[1] })
         const defaultStatus = await instance.Allowance(token.address, accounts[1])
         assert.equal(defaultStatus, false)
-        await instance.SwapBuyBackStatus(token.address, { from: accounts[1] })
+        await instance.approveTokenRedemption(token.address, true, { from: accounts[1] })
         const vaultStatus = await instance.Allowance(token.address, accounts[1])
         assert.equal(vaultStatus, true)
     })
@@ -154,7 +154,7 @@ contract("DelayVault", (accounts) => {
         // Create new vault
         const token = await TestToken.new("TestToken", "TEST")
         await token.approve(instance.address, amount)
-        await instance.swapTokenStatusFilter(token.address)
+        await instance.setTokenStatusFilter(token.address, true)
         const startDelay = week
         const cliffDelay = week
         const finishDelay = week * 2

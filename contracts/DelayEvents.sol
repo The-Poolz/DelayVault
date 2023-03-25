@@ -18,7 +18,12 @@ interface DelayEvents {
         uint256[] CliffDelays,
         uint256[] FinishDelays
     );
-    event BoughtBackTokens(
+    event TokenRedemptionApproval(
+        address indexed Token,
+        address indexed User,
+        bool Status
+    );
+    event RedeemedTokens(
         address indexed Token,
         uint256 Amount,
         uint256 RemaningAmount

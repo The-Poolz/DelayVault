@@ -73,7 +73,7 @@ contract("Delay vault data", (accounts) => {
         await instance.setMinDelays(token.address, amounts, startDelays, cliffDelays, finishDelays)
         status = await instance.GetTokenFilterStatus(token.address)
         assert.equal(status, true)
-        await instance.swapTokenStatusFilter(token.address)
+        await instance.setTokenStatusFilter(token.address, false)
         status = await instance.GetTokenFilterStatus(token.address)
         assert.equal(status, false)
     })
