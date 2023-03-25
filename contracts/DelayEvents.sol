@@ -19,9 +19,9 @@ contract DelayEvents {
         uint256[] FinishDelays
     );
     event TokenRedemptionApproval(
-        address indexed token,
-        address indexed user,
-        bool status
+        address indexed Token,
+        address indexed User,
+        bool Status
     );
     event RedeemedTokens(
         address indexed Token,
