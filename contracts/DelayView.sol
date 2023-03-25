@@ -68,11 +68,7 @@ contract DelayView is DelayManageable {
 
     function GetDelayLimits(
         address _token
-    )
-        external
-        view
-        returns (Delay memory)
-    {
+    ) external view returns (Delay memory) {
         return DelayLimit[_token];
     }
 
@@ -86,35 +82,6 @@ contract DelayView is DelayManageable {
         returns (uint256 _startDelay, uint256 _cliffDelay, uint256 _finishDelay)
     {
         return _getMinDelays(_token, _amount);
-    }
-
-    function _getMinDelays(
-        address _token,
-        uint256 _amount
-    )
-        internal
-        view
-        returns (
-            uint256 _startDelay,
-            uint256 _cliffDelay,
-            uint256 _finishDelay
-        )
-    {
-        Delay memory delayLimit = DelayLimit[_token];
-        uint256 arrLength = delayLimit.Amounts.length;
-        if (arrLength == 0 || delayLimit.Amounts[0] > _amount) return (0, 0, 0);
-        _startDelay = delayLimit.StartDelays[0];
-        _cliffDelay = delayLimit.CliffDelays[0];
-        _finishDelay = delayLimit.FinishDelays[0];
-        for (uint256 i = 1; i < arrLength; i++) {
-            if (_amount >= delayLimit.Amounts[i]) {
-                _startDelay = delayLimit.StartDelays[i];
-                _cliffDelay = delayLimit.CliffDelays[i];
-                _finishDelay = delayLimit.FinishDelays[i];
-            } else {
-                break;
-            }
-        }
     }
 
     function GetTokenFilterStatus(address _token) external view returns (bool) {

@@ -25,30 +25,28 @@ contract DelayVault is DelayView {
         notZeroAddress(_token)
         isTokenActive(_token)
     {
-        _shortDelay(_token, _startDelay, _cliffDelay, _finishDelay); // Stack Too deep error fixing
-        Vault storage vault = VaultMap[_token][msg.sender];
         require(
             _startDelay <= MaxDelay &&
-                _cliffDelay <= MaxDelay &&
-                _finishDelay <= MaxDelay,
+            _cliffDelay <= MaxDelay &&
+            _finishDelay <= MaxDelay,
             "Delay greater than Allowed"
         );
+        Vault storage vault = VaultMap[_token][msg.sender];
         require( // for the possibility of increasing only the time parameters
             _amount > 0 ||
-                _startDelay > vault.StartDelay ||
-                _cliffDelay > vault.CliffDelay ||
-                _finishDelay > vault.FinishDelay,
+            _startDelay > vault.StartDelay ||
+            _cliffDelay > vault.CliffDelay ||
+            _finishDelay > vault.FinishDelay,
             "Invalid parameters: increase at least one value"
         );
-        (
-            uint256 _startMinDelay,
-            uint256 _cliffMinDelay,
-            uint256 _finishMinDelay
-        ) = _getMinDelays(_token, vault.Amount + _amount);
-        // Checking the minimum delay for each timing parameter.
-        _checkMinDelay(_startDelay, _startMinDelay);
-        _checkMinDelay(_cliffDelay, _cliffMinDelay);
-        _checkMinDelay(_finishDelay, _finishMinDelay);
+        _DelayValidator(
+            _token,
+            _amount,
+            _startDelay,
+            _cliffDelay,
+            _finishDelay,
+            vault
+        );
         vault.StartDelay = _startDelay;
         vault.CliffDelay = _cliffDelay;
         vault.FinishDelay = _finishDelay;
@@ -108,17 +106,5 @@ contract DelayVault is DelayView {
     function approveTokenRedemption(address _token, bool _status) external {
         Allowance[_token][msg.sender] = _status;
         emit TokenRedemptionApproval(_token, msg.sender, _status);
-    }
-
-    /// @dev the user can't set a time parameter less than the last one
-    function _shortDelay(
-        address _token,
-        uint256 _startDelay,
-        uint256 _cliffDelay,
-        uint256 _finishDelay
-    ) private view {
-        _shortStartDelay(_token, _startDelay);
-        _shortCliffDelay(_token, _cliffDelay);
-        _shortFinishDelay(_token, _finishDelay);
     }
 }
