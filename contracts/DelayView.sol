@@ -5,11 +5,9 @@ import "./DelayManageable.sol";
 
 /// @title DelayView - getter view functions
 contract DelayView is DelayManageable {
-    function GetAllUsersData(address _token)
-        external
-        view
-        returns (address[] memory, Vault[] memory _vaults)
-    {
+    function GetAllUsersData(
+        address _token
+    ) external view returns (address[] memory, Vault[] memory _vaults) {
         _vaults = new Vault[](TokenToUsers[_token].length);
         for (uint256 i = 0; i < TokenToUsers[_token].length; i++) {
             _vaults[i] = VaultMap[_token][TokenToUsers[_token][i]];
@@ -17,19 +15,15 @@ contract DelayView is DelayManageable {
         return (TokenToUsers[_token], _vaults);
     }
 
-    function GetAllMyTokens(address _user)
-        external
-        view
-        returns (address[] memory)
-    {
+    function GetAllMyTokens(
+        address _user
+    ) external view returns (address[] memory) {
         return MyTokens[_user];
     }
 
-    function GetMyTokens(address _user)
-        external
-        view
-        returns (address[] memory)
-    {
+    function GetMyTokens(
+        address _user
+    ) external view returns (address[] memory) {
         address[] memory allTokens = MyTokens[_user];
         address[] memory tokens = new address[](allTokens.length);
         uint256 index;
@@ -41,7 +35,9 @@ contract DelayView is DelayManageable {
         return Array.KeepNElementsInArray(tokens, index);
     }
 
-    function GetDelayLimits(address _token)
+    function GetDelayLimits(
+        address _token
+    )
         external
         view
         returns (
@@ -59,27 +55,25 @@ contract DelayView is DelayManageable {
         );
     }
 
-    function GetMinDelays(address _token, uint256 _amount)
+    function GetMinDelays(
+        address _token,
+        uint256 _amount
+    )
         external
         view
         isTokenActive(_token)
-        returns (
-            uint256 _startDelay,
-            uint256 _cliffDelay,
-            uint256 _finishDelay
-        )
+        returns (uint256 _startDelay, uint256 _cliffDelay, uint256 _finishDelay)
     {
-           return _getMinDelays(_token, _amount);
+        return _getMinDelays(_token, _amount);
     }
 
-    function _getMinDelays(address _token, uint256 _amount)
+    function _getMinDelays(
+        address _token,
+        uint256 _amount
+    )
         internal
-        view      
-        returns (
-            uint256 _startDelay,
-            uint256 _cliffDelay,
-            uint256 _finishDelay
-        )
+        view
+        returns (uint256 _startDelay, uint256 _cliffDelay, uint256 _finishDelay)
     {
         Delay memory delayLimit = DelayLimit[_token];
         uint256 arrLength = delayLimit.Amounts.length;
@@ -102,10 +96,7 @@ contract DelayView is DelayManageable {
         return DelayLimit[_token].isActive;
     }
 
-    function getChecksum() public view returns(bytes32) {
-    return keccak256(abi.encodePacked(
-        owner(),
-        GovernerContract
-    ));
+    function getChecksum() public view returns (bytes32) {
+        return keccak256(abi.encodePacked(owner(), GovernerContract));
     }
 }
