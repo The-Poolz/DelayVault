@@ -49,19 +49,22 @@ contract DelayVault is DelayView {
         _checkMinDelay(_startDelay, _startMinDelay);
         _checkMinDelay(_cliffDelay, _cliffMinDelay);
         _checkMinDelay(_finishDelay, _finishMinDelay);
-        if (_amount > 0) TransferInToken(_token, msg.sender, _amount);
         vault.StartDelay = _startDelay;
         vault.CliffDelay = _cliffDelay;
         vault.FinishDelay = _finishDelay;
         Array.addIfNotExsist(TokenToUsers[_token], msg.sender);
         Array.addIfNotExsist(MyTokens[msg.sender], _token);
+        if (_amount > 0) {
+            vault.Amount += _amount;
+            TransferInToken(_token, msg.sender, _amount);
+        }
         emit VaultValueChanged(
             _token,
             msg.sender,
-            vault.Amount += _amount,
-            _startDelay,
-            _cliffDelay,
-            _finishDelay
+            vault.Amount,
+            vault.StartDelay,
+            vault.CliffDelay,
+            vault.FinishDelay
         );
     }
 
