@@ -26,7 +26,7 @@ contract("DelayVault", (accounts) => {
         await token.approve(instance.address, amount)
         await truffleAssert.reverts(
             instance.CreateVault(token.address, amount, day, day, week),
-            "delay less than min delay"
+            "Invalid delay parameters"
         )
     })
 
@@ -35,7 +35,7 @@ contract("DelayVault", (accounts) => {
         await token.approve(instance.address, amount)
         await truffleAssert.reverts(
             instance.CreateVault(token.address, amount, week, week, day),
-            "delay less than min delay"
+            "Invalid delay parameters"
         )
     })
 
@@ -44,7 +44,7 @@ contract("DelayVault", (accounts) => {
         await token.approve(instance.address, amount)
         await truffleAssert.reverts(
             instance.CreateVault(token.address, amount, week, day, week),
-            "delay less than min delay"
+            "Invalid delay parameters"
         )
     })
 
@@ -98,11 +98,11 @@ contract("DelayVault", (accounts) => {
         await token.approve(instance.address, amount)
         await truffleAssert.reverts(
             instance.CreateVault(token.address, amount, day, twoDays, week * 2),
-            "can't set a shorter start period than the last one"
+            "Invalid delay parameters"
         )
         await truffleAssert.reverts(
             instance.CreateVault(token.address, amount, week, week, twoDays),
-            "can't set a shorter finish period than the last one"
+            "Invalid delay parameters"
         )
     })
 

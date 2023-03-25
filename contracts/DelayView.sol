@@ -54,16 +54,19 @@ contract DelayView is DelayManageable {
 
     function GetMyTokens(
         address _user
-    ) external view returns (address[] memory) {
+    ) external view returns (address[] memory tokens) {
         address[] memory allTokens = MyTokens[_user];
-        address[] memory tokens = new address[](allTokens.length);
-        uint256 index;
+        tokens = new address[](allTokens.length);
+        uint256 index = 0;
         for (uint256 i = 0; i < allTokens.length; i++) {
             if (VaultMap[allTokens[i]][_user].Amount > 0) {
                 tokens[index++] = allTokens[i];
             }
         }
-        return Array.KeepNElementsInArray(tokens, index);
+        // Resize the array to remove the empty slots
+        assembly {
+            mstore(tokens, index)
+        }
     }
 
     function GetDelayLimits(
