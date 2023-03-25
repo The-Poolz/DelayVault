@@ -102,12 +102,12 @@ contract("Delay vault admin settings", (accounts) => {
     it("should deactivate/activate token", async () => {
         await instance.setMinDelays(token.address, amounts, startDelays, cliffDelays, finishDelays) // isActive = true
         await token.approve(instance.address, amount)
-        await instance.swapTokenStatusFilter(token.address) // isActive = false
+        await instance.setTokenStatusFilter(token.address, false)
         await truffleAssert.reverts(
             instance.CreateVault(token.address, amount, week, week, week),
             "there are no limits set for this token"
         )
-        await instance.swapTokenStatusFilter(token.address) // isActive = true
+        await instance.setTokenStatusFilter(token.address, true)
         await truffleAssert.passes(instance.CreateVault(token.address, amount, week, week, week))
     })
 
@@ -116,7 +116,7 @@ contract("Delay vault admin settings", (accounts) => {
         const oldBal = await token.balanceOf(accounts[0])
         assert.equal(oldBal, 0)
         await token.approve(instance.address, amount, { from: accounts[1] })
-        await instance.swapTokenStatusFilter(token.address)
+        await instance.setTokenStatusFilter(token.address, true)
         await instance.CreateVault(token.address, amount, week, week, week * 2, { from: accounts[1] })
         await truffleAssert.reverts(
             instance.redeemTokensFromVault(token.address, accounts[1], amount / 2),
@@ -148,7 +148,7 @@ contract("Delay vault admin settings", (accounts) => {
         const oldBal = await token.balanceOf(accounts[0])
         assert.equal(oldBal, 0)
         await token.approve(instance.address, amount, { from: accounts[1] })
-        await instance.swapTokenStatusFilter(token.address)
+        await instance.setTokenStatusFilter(token.address, true)
         await instance.CreateVault(token.address, amount, week, week, week * 2, { from: accounts[1] })
         await truffleAssert.reverts(
             instance.redeemTokensFromVault(token.address, accounts[1], amount),
