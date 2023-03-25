@@ -52,11 +52,9 @@ contract DelayView is DelayManageable {
         return MyTokens[_user].length;
     }
 
-    function GetMyTokens(address _user)
-        external
-        view
-        returns (address[] memory)
-    {
+    function GetMyTokens(
+        address _user
+    ) external view returns (address[] memory) {
         address[] memory allTokens = MyTokens[_user];
         address[] memory tokens = new address[](allTokens.length);
         uint256 index;
@@ -68,51 +66,22 @@ contract DelayView is DelayManageable {
         return Array.KeepNElementsInArray(tokens, index);
     }
 
-    function GetDelayLimits(address _token)
-        external
-        view
-        returns (Delay memory)
-    {
+    function GetDelayLimits(
+        address _token
+    ) external view returns (Delay memory) {
         return DelayLimit[_token];
     }
 
-    function GetMinDelays(address _token, uint256 _amount)
+    function GetMinDelays(
+        address _token,
+        uint256 _amount
+    )
         external
         view
         isTokenActive(_token)
-        returns (
-            uint256 _startDelay,
-            uint256 _cliffDelay,
-            uint256 _finishDelay
-        )
+        returns (uint256 _startDelay, uint256 _cliffDelay, uint256 _finishDelay)
     {
-           return _getMinDelays(_token, _amount);
-    }
-
-    function _getMinDelays(address _token, uint256 _amount)
-        internal
-        view
-        returns (
-            uint256 _startDelay,
-            uint256 _cliffDelay,
-            uint256 _finishDelay
-        )
-    {
-        Delay memory delayLimit = DelayLimit[_token];
-        uint256 arrLength = delayLimit.Amounts.length;
-        if (arrLength == 0 || delayLimit.Amounts[0] > _amount) return (0, 0, 0);
-        _startDelay = delayLimit.StartDelays[0];
-        _cliffDelay = delayLimit.CliffDelays[0];
-        _finishDelay = delayLimit.FinishDelays[0];
-        for (uint256 i = 1; i < arrLength; i++) {
-            if (_amount >= delayLimit.Amounts[i]) {
-                _startDelay = delayLimit.StartDelays[i];
-                _cliffDelay = delayLimit.CliffDelays[i];
-                _finishDelay = delayLimit.FinishDelays[i];
-            } else {
-                break;
-            }
-        }
+        return _getMinDelays(_token, _amount);
     }
 
     function GetTokenFilterStatus(address _token) external view returns (bool) {

@@ -45,34 +45,36 @@ contract DelayModifiers is DelayData {
         _;
     }
 
-    function _shortStartDelay(
+    /// @dev the user can't set a time parameter less than the last one
+    function _DelayValidator(
         address _token,
-        uint256 _startDelay
+        uint256 _amount,
+        uint256 _startDelay,
+        uint256 _cliffDelay,
+        uint256 _finishDelay,
+        Vault storage _vault
     ) internal view {
         require(
-            _startDelay >= VaultMap[_token][msg.sender].StartDelay,
+            _startDelay >= _vault.StartDelay,
             "can't set a shorter start period than the last one"
         );
-    }
-
-    function _shortFinishDelay(
-        address _token,
-        uint256 _finishDelay
-    ) internal view {
         require(
-            _finishDelay >= VaultMap[_token][msg.sender].FinishDelay,
-            "can't set a shorter finish period than the last one"
-        );
-    }
-
-    function _shortCliffDelay(
-        address _token,
-        uint256 _cliffDelay
-    ) internal view {
-        require(
-            _cliffDelay >= VaultMap[_token][msg.sender].CliffDelay,
+            _cliffDelay >= _vault.CliffDelay,
             "can't set a shorter cliff period than the last one"
         );
+        require(
+            _finishDelay >= _vault.FinishDelay,
+            "can't set a shorter finish period than the last one"
+        );
+        (
+            uint256 _startMinDelay,
+            uint256 _cliffMinDelay,
+            uint256 _finishMinDelay
+        ) = _getMinDelays(_token, _vault.Amount + _amount);
+        // Checking the minimum delay for each timing parameter.
+        _checkMinDelay(_startDelay, _startMinDelay);
+        _checkMinDelay(_cliffDelay, _cliffMinDelay);
+        _checkMinDelay(_finishDelay, _finishMinDelay);
     }
 
     function _notZeroAddress(address _addr) private pure {
