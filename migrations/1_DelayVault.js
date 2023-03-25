@@ -6,7 +6,7 @@ module.exports = async function (deployer, network, accounts) {
   await deployer.deploy(DelayVault);
   const delayVaultInstance = await DelayVault.deployed();
   const deployerAddress = accounts[0];
-  await delayVaultInstance.setGovernerContract(deployerAddress);
+  await delayVaultInstance.setGovernorContract(deployerAddress);
 
   // Transfer ownership to the multisig wallet (only for non-testnet and non-local networks)
   if (network !== "test" && network !== "development" && network !== "soliditycoverage") {
