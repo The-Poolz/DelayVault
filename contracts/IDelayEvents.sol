@@ -2,7 +2,7 @@
 pragma solidity 0.8.19;
 
 /// @title contains all events.
-interface DelayEvents {
+interface IDelayEvents {
     event VaultValueChanged(
         address indexed Token,
         address indexed Owner,

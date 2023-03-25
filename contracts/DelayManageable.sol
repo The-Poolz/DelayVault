@@ -6,13 +6,13 @@ import "poolz-helper-v2/contracts/GovManager.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "poolz-helper-v2/contracts/ERC20Helper.sol";
 import "./DelayModifiers.sol";
-import "./DelayEvents.sol";
+import "./IDelayEvents.sol";
 
 /// @title all admin settings
 contract DelayManageable is
     Pausable,
     GovManager,
-    DelayEvents,
+    IDelayEvents,
     DelayModifiers,
     ERC20Helper,
     ReentrancyGuard
