@@ -70,7 +70,6 @@ function _DelayValidator(
         );
     }
 
-
     function _notZeroAddress(address _addr) private pure {
         require(_addr != address(0), "address can't be null");
     }
