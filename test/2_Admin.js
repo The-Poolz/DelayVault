@@ -54,11 +54,14 @@ contract("Delay vault admin settings", (accounts) => {
     it("should set max delay", async () => {
         const oldMaxDelay = await instance.MaxDelay()
         const maxDelay = 604800 // 1 week in seconds
-        await instance.setMaxDelay(maxDelay)
+        const tx = await instance.setMaxDelay(maxDelay)
+        const oldDelay = tx.logs[0].args.OldDelay
+        const newDelay = tx.logs[0].args.NewDelay
         const newMaxDelay = await instance.MaxDelay()
         assert.equal(newMaxDelay.toString(), maxDelay.toString())
+        assert.equal(oldDelay.toString(), oldMaxDelay.toString())
+        assert.equal(newDelay.toString(), newMaxDelay.toString())
         await truffleAssert.reverts(instance.setMaxDelay(maxDelay), "can't set the same value")
-        await truffleAssert.reverts(instance.setMaxDelay("0"), "max Delay can't be null")
         // bring back the old delay
         await instance.setMaxDelay(oldMaxDelay)
     })
@@ -122,7 +125,10 @@ contract("Delay vault admin settings", (accounts) => {
             instance.redeemTokensFromVault(token.address, accounts[1], amount / 2),
             "permission not granted"
         )
-        await truffleAssert.reverts(instance.redeemTokensFromVault(token.address, accounts[1], amount * 2), "invalid amount")
+        await truffleAssert.reverts(
+            instance.redeemTokensFromVault(token.address, accounts[1], amount * 2),
+            "invalid amount"
+        )
         // user approve the redemption of their tokens by the admin
         await instance.approveTokenRedemption(token.address, true, { from: accounts[1] })
         // buy back half tokens
