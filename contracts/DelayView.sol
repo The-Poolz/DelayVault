@@ -5,24 +5,51 @@ import "./DelayManageable.sol";
 
 /// @title DelayView - getter view functions
 contract DelayView is DelayManageable {
-    function GetAllUsersData(address _token)
-        external
-        view
-        returns (address[] memory, Vault[] memory _vaults)
-    {
-        _vaults = new Vault[](TokenToUsers[_token].length);
-        for (uint256 i = 0; i < TokenToUsers[_token].length; i++) {
+    function GetUsersDataByRange(
+        address _token,
+        uint256 _from,
+        uint256 _to
+    ) external view returns (address[] memory _users, Vault[] memory _vaults) {
+        require(_from <= _to, "_from index can't be greater than _to");
+        require(
+            _from < TokenToUsers[_token].length &&
+                _to < TokenToUsers[_token].length,
+            "index out of range"
+        );
+        _vaults = new Vault[](_to - _from + 1);
+        _users = new address[](_to - _from + 1);
+        for (uint256 i = _from; i <= _to; i++) {
+            _users[i] = TokenToUsers[_token][i];
             _vaults[i] = VaultMap[_token][TokenToUsers[_token][i]];
         }
-        return (TokenToUsers[_token], _vaults);
     }
 
-    function GetAllMyTokens(address _user)
-        external
-        view
-        returns (address[] memory)
-    {
-        return MyTokens[_user];
+    function GetMyTokensByRange(
+        address _user,
+        uint256 _from,
+        uint256 _to
+    ) external view returns (address[] memory _tokens) {
+        require(_from <= _to, "_from index can't be greater than _to");
+        require(
+            _from < MyTokens[_user].length && _to < MyTokens[_user].length,
+            "index out of range"
+        );
+        _tokens = new address[](_to - _from + 1);
+        for (uint256 i = _from; i <= _to; i++) {
+            _tokens[i] = MyTokens[_user][i];
+        }
+    }
+
+    function GetUsersLengthByToken(
+        address _token
+    ) external view returns (uint256) {
+        return TokenToUsers[_token].length;
+    }
+
+    function GetMyTokensLengthByUser(
+        address _user
+    ) external view returns (uint256) {
+        return MyTokens[_user].length;
     }
 
     function GetMyTokens(address _user)
@@ -64,7 +91,7 @@ contract DelayView is DelayManageable {
 
     function _getMinDelays(address _token, uint256 _amount)
         internal
-        view      
+        view
         returns (
             uint256 _startDelay,
             uint256 _cliffDelay,
