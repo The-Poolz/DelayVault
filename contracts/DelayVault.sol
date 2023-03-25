@@ -8,8 +8,8 @@ import "./DelayView.sol";
 /// @author The-Poolz contract team
 contract DelayVault is DelayView {
     constructor() {
-        // maxDelay are unlimited by default
-        MaxDelay = type(uint256).max;
+        // maxDelay is set to year by default
+        MaxDelay = 365 days;
     }
 
     function CreateVault(

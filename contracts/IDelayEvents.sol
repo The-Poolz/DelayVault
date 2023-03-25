@@ -18,6 +18,10 @@ interface IDelayEvents {
         uint256[] CliffDelays,
         uint256[] FinishDelays
     );
+    event UpdatedMaxDelay(
+        uint256 OldDelay,
+        uint256 NewDelay
+    );
     event TokenRedemptionApproval(
         address indexed Token,
         address indexed User,
