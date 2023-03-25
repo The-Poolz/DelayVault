@@ -44,25 +44,27 @@ contract DelayView is DelayManageable {
     function GetDelayLimits(address _token)
         external
         view
-        returns (
-            uint256[] memory _amount,
-            uint256[] memory _startDelays,
-            uint256[] memory _cliffDelays,
-            uint256[] memory _finishDelays
-        )
+        returns (Delay memory)
     {
-        (_amount, _startDelays, _cliffDelays, _finishDelays) = (
-            DelayLimit[_token].Amounts,
-            DelayLimit[_token].StartDelays,
-            DelayLimit[_token].CliffDelays,
-            DelayLimit[_token].FinishDelays
-        );
+        return DelayLimit[_token];
     }
 
     function GetMinDelays(address _token, uint256 _amount)
-        public
+        external
         view
         isTokenActive(_token)
+        returns (
+            uint256 _startDelay,
+            uint256 _cliffDelay,
+            uint256 _finishDelay
+        )
+    {
+           return _getMinDelays(_token, _amount);
+    }
+
+    function _getMinDelays(address _token, uint256 _amount)
+        internal
+        view      
         returns (
             uint256 _startDelay,
             uint256 _cliffDelay,

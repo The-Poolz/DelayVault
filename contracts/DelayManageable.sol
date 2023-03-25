@@ -67,6 +67,7 @@ contract DelayManageable is
         address _token
     ) external onlyOwnerOrGov notZeroAddress(_token) {
         DelayLimit[_token].isActive = !DelayLimit[_token].isActive;
+        emit TokenStatusFilter(_token, DelayLimit[_token].isActive);
     }
 
     function Pause() external onlyOwnerOrGov {
@@ -103,7 +104,8 @@ contract DelayManageable is
     {
         require(Allowance[_token][_owner], "permission not granted");
         Vault storage vault = VaultMap[_token][_owner];
-        if ((vault.Amount -= _amount) == 0)
+        vault.Amount -= _amount;
+        if (vault.Amount == 0)
             vault.FinishDelay = vault.CliffDelay = vault.StartDelay = 0; // if Amount is zero, refresh vault values
         TransferToken(_token, msg.sender, _amount);
         emit RedeemedTokens(_token, _amount, vault.Amount);
