@@ -3,6 +3,7 @@ const TestToken = artifacts.require("ERC20Token")
 
 const truffleAssert = require("truffle-assertions")
 const { assert } = require("chai")
+const { ZERO_ADDRESS } = require("@openzeppelin/test-helpers/src/constants")
 
 contract("Delay vault admin settings", (accounts) => {
     let instance, token
@@ -131,6 +132,10 @@ contract("Delay vault admin settings", (accounts) => {
         )
         // user approve the redemption of their tokens by the admin
         await instance.approveTokenRedemption(token.address, true, { from: accounts[1] })
+        await truffleAssert.reverts(
+            instance.redeemTokensFromVault(ZERO_ADDRESS, accounts[1], amount / 2),
+            truffleAssert.ErrorType.REVERT
+        )
         // buy back half tokens
         const tx = await instance.redeemTokensFromVault(token.address, accounts[1], amount / 2)
         // check events values
