@@ -114,6 +114,16 @@ contract("Delay vault admin settings", (accounts) => {
         await truffleAssert.passes(instance.CreateVault(token.address, amount, week, week, week))
     })
 
+    it("should revert when one of timestamp elements greater than the maximum delay", async () => {
+        const oldMaxDelay = await instance.MaxDelay()
+        await instance.setMaxDelay(0)
+        await truffleAssert.reverts(
+            instance.setMinDelays(token.address, amounts, startDelays, cliffDelays, finishDelays),
+            "one of timestamp elements greater than the maximum delay"
+        )
+        await instance.setMaxDelay(oldMaxDelay)
+    })
+
     it("buy back half tokens from vault", async () => {
         const token = await TestToken.new("TestToken", "TEST", { from: accounts[1] })
         const oldBal = await token.balanceOf(accounts[0])

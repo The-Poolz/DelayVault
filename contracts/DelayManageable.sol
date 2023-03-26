@@ -40,6 +40,15 @@ contract DelayManageable is
             _cliffDelays.length,
             _finishDelays.length
         );
+        // timestamps may not be sorted
+        for (uint256 i = 0; i < _startDelays.length; i++) {
+            require(
+                _startDelays[i] <= MaxDelay &&
+                    _cliffDelays[i] <= MaxDelay &&
+                    _finishDelays[i] <= MaxDelay,
+                "one of timestamp elements greater than the maximum delay"
+            );
+        }
         DelayLimit[_token] = Delay(
             _amounts,
             _startDelays,
