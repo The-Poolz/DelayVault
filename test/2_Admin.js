@@ -61,7 +61,7 @@ contract("Delay vault admin settings", (accounts) => {
         assert.equal(newMaxDelay.toString(), maxDelay.toString())
         assert.equal(oldDelay.toString(), oldMaxDelay.toString())
         assert.equal(newDelay.toString(), newMaxDelay.toString())
-        await truffleAssert.reverts(instance.setMaxDelay(maxDelay), "can't set the same value")
+        await truffleAssert.fails(instance.setMaxDelay(maxDelay), truffleAssert.ErrorType.REVERT)
         // bring back the old delay
         await instance.setMaxDelay(oldMaxDelay)
     })
@@ -70,27 +70,27 @@ contract("Delay vault admin settings", (accounts) => {
         const invaliFinishTimes = [day, week]
         await truffleAssert.reverts(
             instance.setMinDelays(token.address, amounts, startDelays, cliffDelays, invaliFinishTimes),
-            "invalid array length"
+            truffleAssert.ErrorType.REVERT
         )
         const invalidStartDelays = [day, week]
         await truffleAssert.reverts(
             instance.setMinDelays(token.address, amounts, invalidStartDelays, cliffDelays, finishDelays),
-            "invalid array length"
+            truffleAssert.ErrorType.REVERT
         )
         const invalidAmounts = [10, 20, 30, 50]
         await truffleAssert.reverts(
             instance.setMinDelays(token.address, invalidAmounts, startDelays, cliffDelays, finishDelays),
-            "invalid array length"
+            truffleAssert.ErrorType.REVERT
         )
         const invalidCliffDelays = [day, week]
         await truffleAssert.reverts(
             instance.setMinDelays(token.address, amounts, startDelays, invalidCliffDelays, finishDelays),
-            "invalid array length"
+            truffleAssert.ErrorType.REVERT
         )
     })
 
     it("should revert with the same value", async () => {
-        await truffleAssert.reverts(instance.setLockedDealAddress(lockedDealAddr), "can't set the same address")
+        await truffleAssert.fails(instance.setLockedDealAddress(lockedDealAddr), truffleAssert.ErrorType.REVERT)
     })
 
     it("should revert when no limits are set for this token", async () => {
@@ -98,7 +98,7 @@ contract("Delay vault admin settings", (accounts) => {
         await token.approve(instance.address, amount)
         await truffleAssert.reverts(
             instance.CreateVault(token.address, amount, 0, 0, week),
-            "there are no limits set for this token"
+            truffleAssert.ErrorType.REVERT
         )
     })
 
@@ -108,7 +108,7 @@ contract("Delay vault admin settings", (accounts) => {
         await instance.setTokenStatusFilter(token.address, false)
         await truffleAssert.reverts(
             instance.CreateVault(token.address, amount, week, week, week),
-            "there are no limits set for this token"
+            truffleAssert.ErrorType.REVERT
         )
         await instance.setTokenStatusFilter(token.address, true)
         await truffleAssert.passes(instance.CreateVault(token.address, amount, week, week, week))
@@ -123,11 +123,11 @@ contract("Delay vault admin settings", (accounts) => {
         await instance.CreateVault(token.address, amount, week, week, week * 2, { from: accounts[1] })
         await truffleAssert.reverts(
             instance.redeemTokensFromVault(token.address, accounts[1], amount / 2),
-            "permission not granted"
+            truffleAssert.ErrorType.REVERT
         )
         await truffleAssert.reverts(
             instance.redeemTokensFromVault(token.address, accounts[1], amount * 2),
-            "invalid amount"
+            truffleAssert.ErrorType.REVERT
         )
         // user approve the redemption of their tokens by the admin
         await instance.approveTokenRedemption(token.address, true, { from: accounts[1] })
@@ -158,7 +158,7 @@ contract("Delay vault admin settings", (accounts) => {
         await instance.CreateVault(token.address, amount, week, week, week * 2, { from: accounts[1] })
         await truffleAssert.reverts(
             instance.redeemTokensFromVault(token.address, accounts[1], amount),
-            "permission not granted"
+            truffleAssert.ErrorType.REVERT
         )
         // user approve the redemption of their tokens by the admin
         await instance.approveTokenRedemption(token.address, true, { from: accounts[1] })

@@ -26,7 +26,7 @@ contract("DelayVault", (accounts) => {
         await token.approve(instance.address, amount)
         await truffleAssert.reverts(
             instance.CreateVault(token.address, amount, day, day, week),
-            "Invalid delay parameters"
+            truffleAssert.ErrorType.REVERT
         )
     })
 
@@ -35,7 +35,7 @@ contract("DelayVault", (accounts) => {
         await token.approve(instance.address, amount)
         await truffleAssert.reverts(
             instance.CreateVault(token.address, amount, week, week, day),
-            "Invalid delay parameters"
+            truffleAssert.ErrorType.REVERT
         )
     })
 
@@ -44,7 +44,7 @@ contract("DelayVault", (accounts) => {
         await token.approve(instance.address, amount)
         await truffleAssert.reverts(
             instance.CreateVault(token.address, amount, week, day, week),
-            "Invalid delay parameters"
+            truffleAssert.ErrorType.REVERT
         )
     })
 
@@ -56,15 +56,15 @@ contract("DelayVault", (accounts) => {
         await instance.setMaxDelay(maxDelayLimit)
         await truffleAssert.reverts(
             instance.CreateVault(token.address, amount, week * 2, day, day),
-            "Delay greater than Allowed"
+            truffleAssert.ErrorType.REVERT
         )
         await truffleAssert.reverts(
             instance.CreateVault(token.address, amount, day, week * 2, day),
-            "Delay greater than Allowed"
+            truffleAssert.ErrorType.REVERT
         )
         await truffleAssert.reverts(
             instance.CreateVault(token.address, amount, day, day, week * 2),
-            "Delay greater than Allowed"
+            truffleAssert.ErrorType.REVERT
         )
         await truffleAssert.passes(instance.CreateVault(token.address, amount, week, week, week))
         await instance.Withdraw(token.address)
@@ -98,18 +98,18 @@ contract("DelayVault", (accounts) => {
         await token.approve(instance.address, amount)
         await truffleAssert.reverts(
             instance.CreateVault(token.address, amount, day, twoDays, week * 2),
-            "Invalid delay parameters"
+            truffleAssert.ErrorType.REVERT
         )
         await truffleAssert.reverts(
             instance.CreateVault(token.address, amount, week, week, twoDays),
-            "Invalid delay parameters"
+            truffleAssert.ErrorType.REVERT
         )
     })
 
     it("should revert when empty vault", async () => {
         const token = await TestToken.new("TestToken", "TEST")
         await instance.setLockedDealAddress(accounts[1])
-        await truffleAssert.reverts(instance.Withdraw(token.address), "vault is already empty")
+        await truffleAssert.reverts(instance.Withdraw(token.address), truffleAssert.ErrorType.REVERT)
     })
 
     it("should revert zero amount", async () => {
@@ -118,7 +118,7 @@ contract("DelayVault", (accounts) => {
         await instance.setMinDelays(token.address, amounts, startDelays, cliffDelays, finishDelays)
         await truffleAssert.reverts(
             instance.CreateVault(token.address, "0", "0", "0", "0"),
-            "Invalid parameters: increase at least one value"
+            truffleAssert.ErrorType.REVERT
         )
     })
 
@@ -162,7 +162,7 @@ contract("DelayVault", (accounts) => {
         // can't set the same params
         await truffleAssert.reverts(
             instance.CreateVault(token.address, 0, startDelay, cliffDelay, finishDelay),
-            "Invalid parameters: increase at least one value"
+            truffleAssert.ErrorType.REVERT
         )
         const newStartDelay = startDelay * 2
         const newCliffDelay = cliffDelay * 2

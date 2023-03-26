@@ -9,13 +9,7 @@ contract DelayView is DelayManageable {
         address _token,
         uint256 _from,
         uint256 _to
-    ) external view returns (address[] memory _users, Vault[] memory _vaults) {
-        require(_from <= _to, "_from index can't be greater than _to");
-        require(
-            _from < TokenToUsers[_token].length &&
-                _to < TokenToUsers[_token].length,
-            "index out of range"
-        );
+    ) external ValidatePaging(_from, _to, TokenToUsers[_token].length) view returns (address[] memory _users, Vault[] memory _vaults) {
         _vaults = new Vault[](_to - _from + 1);
         _users = new address[](_to - _from + 1);
         for (uint256 i = _from; i <= _to; i++) {
@@ -28,12 +22,7 @@ contract DelayView is DelayManageable {
         address _user,
         uint256 _from,
         uint256 _to
-    ) external view returns (address[] memory _tokens) {
-        require(_from <= _to, "_from index can't be greater than _to");
-        require(
-            _from < MyTokens[_user].length && _to < MyTokens[_user].length,
-            "index out of range"
-        );
+    ) external ValidatePaging(_from, _to, MyTokens[_user].length) view returns (address[] memory _tokens) {
         _tokens = new address[](_to - _from + 1);
         for (uint256 i = _from; i <= _to; i++) {
             _tokens[i] = MyTokens[_user][i];

@@ -6,13 +6,11 @@ import "poolz-helper-v2/contracts/GovManager.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "poolz-helper-v2/contracts/ERC20Helper.sol";
 import "./DelayModifiers.sol";
-import "./IDelayEvents.sol";
 
 /// @title all admin settings
 contract DelayManageable is
     Pausable,
     GovManager,
-    IDelayEvents,
     DelayModifiers,
     ERC20Helper,
     ReentrancyGuard
@@ -34,7 +32,7 @@ contract DelayManageable is
         uint256[] calldata _cliffDelays,
         uint256[] calldata _finishDelays
     ) external onlyOwnerOrGov notZeroAddress(_token) orderedArray(_amounts) {
-        _equalValues(
+        _EqualValuesValidator(
             _amounts.length,
             _startDelays.length,
             _cliffDelays.length,
@@ -80,17 +78,6 @@ contract DelayManageable is
         _unpause();
     }
 
-    function _equalValues(
-        uint256 _amountsL,
-        uint256 _startDelaysL,
-        uint256 _finishDelaysL,
-        uint256 _cliffDelaysL
-    ) private pure {
-        _equalValue(_amountsL, _startDelaysL);
-        _equalValue(_finishDelaysL, _startDelaysL);
-        _equalValue(_cliffDelaysL, _startDelaysL);
-    }
-
     /// @dev redemption of approved ERC-20 tokens from the contract
     function redeemTokensFromVault(
         address _token,
@@ -104,7 +91,9 @@ contract DelayManageable is
         isVaultNotEmpty(_token, _owner)
         validAmount(VaultMap[_token][_owner].Amount, _amount)
     {
-        require(Allowance[_token][_owner], "permission not granted");
+        if (!Allowance[_token][_owner]) {
+            revert PermissionNotGranted(_token, _owner);
+        }
         Vault storage vault = VaultMap[_token][_owner];
         vault.Amount -= _amount;
         if (vault.Amount == 0)

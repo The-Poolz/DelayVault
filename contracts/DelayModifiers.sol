@@ -3,49 +3,87 @@ pragma solidity 0.8.19;
 
 import "./DelayData.sol";
 import "poolz-helper-v2/contracts/Array.sol";
+import "./IDelayEvents.sol";
 
 /// @title contains modifiers.
-contract DelayModifiers is DelayData {
+contract DelayModifiers is DelayData, IDelayEvents {
     modifier uniqueAddress(address _addr, address _oldAddr) {
-        require(_addr != _oldAddr, "can't set the same address");
+        if (_addr == _oldAddr) {
+            revert AddressNotChanged(_addr, _oldAddr);
+        }
         _;
     }
 
     modifier uniqueValue(uint256 _value, uint256 _oldValue) {
-        require(_value != _oldValue, "can't set the same value");
+        if (_value == _oldValue) {
+            revert ValueNotChanged(_value, _oldValue);
+        }
         _;
     }
 
     modifier notZeroAddress(address _addr) {
-        _notZeroAddress(_addr);
+        if (_addr == address(0)) {
+            revert NullAddress();
+        }
         _;
     }
 
     modifier isVaultNotEmpty(address _token, address _owner) {
-        require(VaultMap[_token][_owner].Amount > 0, "vault is already empty");
+        if (VaultMap[_token][_owner].Amount == 0) {
+            revert EmptyVault(_token, _owner);
+        }
         _;
     }
 
     modifier validAmount(uint256 _fAmount, uint256 _sAmount) {
-        require(_fAmount >= _sAmount, "invalid amount");
+        if (_fAmount < _sAmount) {
+            revert InvalidAmount(_fAmount, _sAmount);
+        }
         _;
     }
 
     ///@dev By default, each token is inactive
     modifier isTokenActive(address _token) {
-        require(
-            DelayLimit[_token].isActive,
-            "there are no limits set for this token"
-        );
+        if (!DelayLimit[_token].isActive) {
+            revert InactiveToken(_token);
+        }
         _;
     }
 
     modifier orderedArray(uint256[] memory _array) {
-        require(Array.isArrayOrdered(_array), "array should be ordered");
+        if (!Array.isArrayOrdered(_array)) {
+            revert NotOrderedArray(_array);
+        }
         _;
     }
 
-function _DelayValidator(
+    modifier ValidatePaging(
+        uint256 _from,
+        uint256 _to,
+        uint256 _max
+    ) {
+        if (_from > _to || _from > _max || _to > _max) {
+            revert OutOfBound(_from, _to, _max);
+        }
+        _;
+    }
+
+    function _EqualValuesValidator(
+        uint256 _amountsL,
+        uint256 _startDelaysL,
+        uint256 _finishDelaysL,
+        uint256 _cliffDelaysL
+    ) internal pure {
+        if (
+            _amountsL != _startDelaysL ||
+            _finishDelaysL != _startDelaysL ||
+            _cliffDelaysL != _startDelaysL
+        ) {
+            revert VauleNotEqual();
+        }
+    }
+
+    function _DelayValidator(
         address _token,
         uint256 _amount,
         uint256 _startDelay,
@@ -58,23 +96,15 @@ function _DelayValidator(
             uint256 _cliffMinDelay,
             uint256 _finishMinDelay
         ) = _getMinDelays(_token, _vault.Amount + _amount);
-
-        require(
-            _startDelay >= _vault.StartDelay &&
-            _cliffDelay >= _vault.CliffDelay &&
-            _finishDelay >= _vault.FinishDelay &&
-            _startDelay >= _startMinDelay &&
-            _cliffDelay >= _cliffMinDelay &&
-            _finishDelay >= _finishMinDelay,
-            "Invalid delay parameters"
-        );
-    }
-
-    function _notZeroAddress(address _addr) private pure {
-        require(_addr != address(0), "address can't be null");
-    }
-
-    function _equalValue(uint256 _fLength, uint256 _sLength) internal pure {
-        require(_fLength == _sLength, "invalid array length");
+        if (
+            !(_startDelay >= _vault.StartDelay &&
+                _cliffDelay >= _vault.CliffDelay &&
+                _finishDelay >= _vault.FinishDelay &&
+                _startDelay >= _startMinDelay &&
+                _cliffDelay >= _cliffMinDelay &&
+                _finishDelay >= _finishMinDelay)
+        ) {
+            revert InvalidDelayParameters();
+        }
     }
 }

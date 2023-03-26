@@ -25,20 +25,23 @@ contract DelayVault is DelayView {
         notZeroAddress(_token)
         isTokenActive(_token)
     {
-        require(
-            _startDelay <= MaxDelay &&
-            _cliffDelay <= MaxDelay &&
-            _finishDelay <= MaxDelay,
-            "Delay greater than Allowed"
-        );
+        if (
+            !(_startDelay <= MaxDelay &&
+                _cliffDelay <= MaxDelay &&
+                _finishDelay <= MaxDelay)
+        ) {
+            revert AboveMaxDelay(MaxDelay);
+        }
         Vault storage vault = VaultMap[_token][msg.sender];
-        require( // for the possibility of increasing only the time parameters
+        if (
+            !(// for the possibility of increasing only the time parameters
             _amount > 0 ||
-            _startDelay > vault.StartDelay ||
-            _cliffDelay > vault.CliffDelay ||
-            _finishDelay > vault.FinishDelay,
-            "Invalid parameters: increase at least one value"
-        );
+                _startDelay > vault.StartDelay ||
+                _cliffDelay > vault.CliffDelay ||
+                _finishDelay > vault.FinishDelay)
+        ) {
+            revert VaultValueNotChanged(_token, msg.sender);
+        }
         _DelayValidator(
             _token,
             _amount,

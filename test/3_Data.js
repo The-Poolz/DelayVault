@@ -82,21 +82,21 @@ contract("Delay vault data", (accounts) => {
         const amounts = [1000, 500, 10000]
         await truffleAssert.reverts(
             instance.setMinDelays(tokens[0].address, amounts, startDelays, cliffDelays, finishDelays),
-            "array should be ordered"
+            truffleAssert.ErrorType.REVERT
         )
     })
 
     it("should revert invalid indices", async () => {
         await truffleAssert.reverts(
             instance.GetUsersDataByRange(tokens[0].address, 100, 0),
-            "_from index can't be greater than _to"
+            truffleAssert.ErrorType.REVERT
         )
         await truffleAssert.reverts(
             instance.GetMyTokensByRange(tokens[0].address, 100, 0),
-            "_from index can't be greater than _to"
+            truffleAssert.ErrorType.REVERT
         )
-        await truffleAssert.reverts(instance.GetUsersDataByRange(tokens[0].address, 5, 10), "index out of range")
-        await truffleAssert.reverts(instance.GetMyTokensByRange(tokens[0].address, 5, 10), "index out of range")
+        await truffleAssert.reverts(instance.GetUsersDataByRange(tokens[0].address, 5, 10), truffleAssert.ErrorType.REVERT)
+        await truffleAssert.reverts(instance.GetMyTokensByRange(tokens[0].address, 5, 10), truffleAssert.ErrorType.REVERT)
     })
 
     it("should get my token addresses", async () => {
