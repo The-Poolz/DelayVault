@@ -63,6 +63,7 @@ contract("Delay vault admin settings", (accounts) => {
         assert.equal(oldDelay.toString(), oldMaxDelay.toString())
         assert.equal(newDelay.toString(), newMaxDelay.toString())
         await truffleAssert.fails(instance.setMaxDelay(maxDelay), truffleAssert.ErrorType.REVERT)
+        await truffleAssert.fails(instance.setMinDelays(token.address, [0], [maxDelay+1], [maxDelay+1], [maxDelay+1]), truffleAssert.ErrorType.REVERT)
         // bring back the old delay
         await instance.setMaxDelay(oldMaxDelay)
     })

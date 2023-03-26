@@ -32,6 +32,13 @@ contract DelayManageable is
         uint256[] calldata _cliffDelays,
         uint256[] calldata _finishDelays
     ) external onlyOwnerOrGov notZeroAddress(_token) orderedArray(_amounts) {
+        if (
+            _startDelays[_startDelays.length - 1] > MaxDelay ||
+            _cliffDelays[_cliffDelays.length - 1] > MaxDelay ||
+            _finishDelays[_finishDelays.length - 1] > MaxDelay
+        ) {
+            revert InvalidDelayParameters();
+        }
         _EqualValuesValidator(
             _amounts.length,
             _startDelays.length,
