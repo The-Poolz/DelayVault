@@ -75,9 +75,9 @@ contract DelayModifiers is DelayData, IDelayEvents {
         uint256 _cliffDelaysL
     ) internal pure {
         if (
-            _amountsL != _startDelaysL ||
-            _finishDelaysL != _startDelaysL ||
-            _cliffDelaysL != _startDelaysL
+            !(_amountsL == _startDelaysL &&
+            _finishDelaysL == _startDelaysL &&
+            _cliffDelaysL == _startDelaysL)
         ) {
             revert VauleNotEqual();
         }
